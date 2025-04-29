@@ -157,7 +157,7 @@ Retrieve a list of your approved message templates.
 ## Support
 
 For support, please contact:
-- Email: support@whatsable.app
+- Email: team@whatsable.app
 - Website: https://www.whatsable.app/
 - GitHub Issues: https://github.com/Whatsable/n8n-nodes-whatsable/issues
 
