@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "WhatsAble is a platform for automating WhatsApp messages, making it easy to start using the WhatsApp API. This node package allows you to use WhatsAble in n8n.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "whatsapp",
+    "messaging",
+    "whatsable",
+    "automation"
   ],
   "license": "MIT",
   "homepage": "https://www.whatsable.app/",
@@ -16,13 +20,11 @@
     "url": "https://github.com/Whatsable/n8n-nodes-whatsable.git"
   },
   "engines": {
-    "node": ">=18.10",
-    "pnpm": ">=9.1"
+    "node": ">=18.10"
   },
   "packageManager": "pnpm@9.1.4",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "build": "tsc && gulp build:icons",
     "dev": "nodemon -w nodes -w credentials --ext ts --exec 'tsc && N8N_CUSTOM_EXTENSIONS=\"/Users/younusaliakash/.n8n/custom\" n8n'",
     "format": "prettier nodes credentials --write",

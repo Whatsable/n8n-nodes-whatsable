@@ -17,15 +17,27 @@ This n8n node allows you to integrate WhatsApp messaging capabilities into your 
 - An n8n instance (version 1.0.0 or higher)
 - A WhatsAble API account and API key
 - Node.js version 18.10 or higher
-- pnpm package manager
 
 ## Installation
 
-1. Install the node in your n8n instance:
-   ```bash
-   pnpm add n8n-nodes-whatsable
-   ```
-2. Restart your n8n instance
+You can install this package using npm, yarn, or pnpm:
+
+**npm:**
+```bash
+npm install n8n-nodes-whatsable
+```
+
+**yarn:**
+```bash
+yarn add n8n-nodes-whatsable
+```
+
+**pnpm:**
+```bash
+pnpm add n8n-nodes-whatsable
+```
+
+After installation, restart your n8n instance.
 
 ## Authentication
 
