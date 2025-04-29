@@ -1,2 +1,26 @@
+# Development files
 .DS_Store
 *.tsbuildinfo
+.git
+.github
+.vscode
+.editorconfig
+.eslintrc.js
+.eslintrc.prepublish.js
+.prettierrc.js
+tsconfig.json
+gulpfile.js
+nodes/**/*.ts
+credentials/**/*.ts
+
+# Build artifacts
+nodemon.json
+node_modules
+*.log
+
+# Documentation and examples
+README_TEMPLATE.md
+CODE_OF_CONDUCT.md
+
+# Tests
+__tests__
