@@ -105,6 +105,41 @@ Retrieve a list of your approved message templates.
 }
 ```
 
+## Development
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Build the package:
+   ```bash
+   pnpm build
+   ```
+4. Run tests:
+   ```bash
+   pnpm test
+   ```
+
+## Testing
+
+This package includes unit tests for both the node and credentials. To run the tests:
+
+```bash
+pnpm test
+```
+
+To run tests in watch mode (useful during development):
+
+```bash
+pnpm test:watch
+```
+
+The tests use Jest and mock external API calls using Nock. The test files are organized as follows:
+
+- `/nodes/WhatsAble/__tests__/`: Tests for the WhatsAble node
+- `/credentials/__tests__/`: Tests for the WhatsAble API credentials
+
 ## Troubleshooting
 
 ### Common Issues
@@ -137,22 +172,6 @@ Retrieve a list of your approved message templates.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## Development
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-3. Build the package:
-   ```bash
-   pnpm build
-   ```
-4. Run tests:
-   ```bash
-   pnpm test
-   ```
 
 ## Support
 
