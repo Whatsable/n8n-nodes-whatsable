@@ -1,0 +1,27 @@
+{
+  "node": "n8n-nodes-base.whatsAbleNotifyerSystem",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": [
+    "Communication"
+  ],
+  "resources": {
+    "credentialDocumentation": [
+      {
+        "url": "https://www.whatsable.app/api-documentation"
+      }
+    ],
+    "primaryDocumentation": [
+      {
+        "url": "https://www.whatsable.app/docs/webhooks"
+      }
+    ]
+  },
+  "alias": [
+    "WhatsApp",
+    "Webhook",
+    "WhatsAble",
+    "Notifyer",
+    "Trigger"
+  ]
+} 

@@ -46,7 +46,8 @@
       "dist/credentials/WhatsAbleApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/WhatsAble/WhatsAble.node.js"
+      "dist/nodes/WhatsAble/WhatsAble.node.js",
+      "dist/nodes/WhatsAble/WhatsAbleNotifyerSystem.node.js"
     ]
   },
   "devDependencies": {
