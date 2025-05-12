@@ -1,5 +1,5 @@
 {
-  "node": "n8n-nodes-base.whatsAbleNotifyerSystem",
+  "node": "n8n-nodes-base.whatsAbleTrigger",
   "nodeVersion": "1.0",
   "codexVersion": "1.0",
   "categories": [
@@ -21,7 +21,6 @@
     "WhatsApp",
     "Webhook",
     "WhatsAble",
-    "Notifyer",
     "Trigger"
   ]
 } 

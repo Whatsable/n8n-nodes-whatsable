@@ -5,23 +5,23 @@ import {
 	IWebhookResponseData,
 } from 'n8n-workflow';
 
-export class WhatsAbleNotifyerSystem implements INodeType {
+export class WhatsAbleTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'WhatsAble Notifyer System',
-		name: 'whatsAbleNotifyerSystem',
+		displayName: 'WhatsAble Trigger',
+		name: 'whatsAbleTrigger',
 		icon: 'file:whatsable.svg',
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["httpMethod"] + ": " + $parameter["path"]}}',
 		description: 'Incoming Message From recipient',
 		defaults: {
-			name: 'WhatsAble Notifyer System',
+			name: 'WhatsAble Trigger',
 		},
-		inputs: ['main'],
+		inputs: [],
 		outputs: ['main'],
 		credentials: [
 			{
-				name: 'whatsAbleApi',
+				name: 'whatsAbleTriggerApi',
 				required: true,
 			},
 		],

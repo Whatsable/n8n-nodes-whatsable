@@ -43,11 +43,12 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/WhatsAbleApi.credentials.js"
+      "dist/credentials/WhatsAbleApi.credentials.js",
+      "dist/credentials/WhatsAbleTriggerApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/WhatsAble/WhatsAble.node.js",
-      "dist/nodes/WhatsAble/WhatsAbleNotifyerSystem.node.js"
+      "dist/nodes/WhatsAble/WhatsAbleTrigger.node.js"
     ]
   },
   "devDependencies": {

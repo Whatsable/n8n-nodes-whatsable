@@ -1,9 +1,9 @@
 const { WhatsAble } = require('./dist/nodes/WhatsAble/WhatsAble.node');
-const { WhatsAbleNotifyerSystem } = require('./dist/nodes/WhatsAble/WhatsAbleNotifyerSystem.node');
+const { WhatsAbleTrigger } = require('./dist/nodes/WhatsAble/WhatsAbleTrigger.node');
 
 module.exports = {
   nodes: [
     WhatsAble,
-    WhatsAbleNotifyerSystem,
+    WhatsAbleTrigger,
   ],
 };
