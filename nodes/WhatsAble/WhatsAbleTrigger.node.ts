@@ -3,7 +3,6 @@ import {
     INodeTypeDescription,
     IWebhookFunctions,
     IWebhookResponseData,
-    IHookFunctions,
 } from 'n8n-workflow';
 
 export class WhatsAbleTrigger implements INodeType {
@@ -71,43 +70,14 @@ export class WhatsAbleTrigger implements INodeType {
         ],
     };
 
-    // Methods to get and log webhook URL
-    webhookMethods = {
-        default: {
-            async checkExists(this: IHookFunctions): Promise<boolean> {
-                // Get the webhook URL
-                const webhookUrl = this.getNodeWebhookUrl('default');
-
-                // Log the webhook URL
-                console.log('WhatsAble Webhook URL:', webhookUrl);
-
-                // You could also add it to the node parameters so it's visible in the UI
-                // this.getNode().webhookUrl = webhookUrl;
-
-                return true;
-            },
-            async create(this: IHookFunctions): Promise<boolean> {
-                // Log the webhook URL when created
-                const webhookUrl = this.getNodeWebhookUrl('default');
-                console.log('WhatsAble Webhook Created with URL:', webhookUrl);
-                return true;
-            },
-            async delete(this: IHookFunctions): Promise<boolean> {
-                // Log when webhook is deleted
-                console.log('WhatsAble Webhook Deleted');
-                return true;
-            },
-        },
-    };
-
     // The function to execute when the webhook gets called
     async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-        // Log the webhook URL again when the webhook is triggered
-        const webhookUrl = this.getNodeWebhookUrl('default');
-        console.log('WhatsAble Webhook Triggered at URL:', webhookUrl);
-
+        // Get the webhook data
+        const webhookData = this.getRequestObject().body;
+        
+        // Return the webhook data to be processed by n8n workflow
         return {
-            workflowData: [this.helpers.returnJsonArray(this.getRequestObject().body)],
+            workflowData: [this.helpers.returnJsonArray(webhookData)],
         };
     }
 }
