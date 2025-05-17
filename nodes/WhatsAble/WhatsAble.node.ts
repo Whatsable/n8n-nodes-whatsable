@@ -10,6 +10,8 @@ import {
 	NodeApiError
 } from 'n8n-workflow';
 
+import { WHATSAPP_TIMEZONES } from './timezones';
+
 export class WhatsAble implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'WhatsAble',
@@ -22,8 +24,8 @@ export class WhatsAble implements INodeType {
 		defaults: {
 			name: 'WhatsAble',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [{ type: 'main' }],
+		outputs: [{ type: 'main' }],
 		credentials: [
 			{
 				name: 'whatsAbleApi',
@@ -161,6 +163,46 @@ export class WhatsAble implements INodeType {
 						supportAutoMap: false,
 					},
 				},
+			},
+			{
+				displayName: 'Would you like to schedule a message?',
+				name: 'scheduleTemplateMessage',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						operation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'Whether to schedule the message for later delivery',
+			},
+			{
+				displayName: 'Scheduled Date and Time',
+				name: 'templateScheduledDateTime',
+				type: 'dateTime',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['sendNotifyerTemplate'],
+						scheduleTemplateMessage: [true],
+					},
+				},
+				description: 'The date and time when the message should be sent',
+				default: '',
+			},
+			{
+				displayName: 'Timezone',
+				name: 'templateTimezone',
+				type: 'options',
+				displayOptions: {
+					show: {
+						operation: ['sendNotifyerTemplate'],
+						scheduleTemplateMessage: [true],
+					},
+				},
+				options: WHATSAPP_TIMEZONES,
+				default: 'Asia/Dhaka',
+				description: 'Timezone for the scheduled date and time',
 			},
 
 			// Fields for whatsable product
@@ -457,6 +499,46 @@ export class WhatsAble implements INodeType {
 				},
 				description: 'The content of the message (text or URL depending on message type)',
 				default: '',
+			},
+			{
+				displayName: 'Would you like to schedule a message?',
+				name: 'scheduleNonTemplateMessage',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						operation: ['sendNonTemplateMessage'],
+					},
+				},
+				description: 'Whether to schedule the message for later delivery',
+			},
+			{
+				displayName: 'Scheduled Date and Time',
+				name: 'nonTemplateScheduledDateTime',
+				type: 'dateTime',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['sendNonTemplateMessage'],
+						scheduleNonTemplateMessage: [true],
+					},
+				},
+				description: 'The date and time when the message should be sent',
+				default: '',
+			},
+			{
+				displayName: 'Timezone',
+				name: 'nonTemplateTimezone',
+				type: 'options',
+				displayOptions: {
+					show: {
+						operation: ['sendNonTemplateMessage'],
+						scheduleNonTemplateMessage: [true],
+					},
+				},
+				options: WHATSAPP_TIMEZONES,
+				default: 'Asia/Dhaka',
+				description: 'Timezone for the scheduled date and time',
 			},
 
 			// Hidden field to store product info
@@ -778,10 +860,10 @@ export class WhatsAble implements INodeType {
 					const recipient = this.getNodeParameter('notifyerRecipient', i) as string;
 					const templateId = this.getNodeParameter('notifyerTemplate', i) as string;
 					const variablesObj = this.getNodeParameter('notifyerVariables', i) as { value: Record<string, string> };
+					const scheduleMessage = this.getNodeParameter('scheduleTemplateMessage', i, false) as boolean;
 
 					// Get template data to validate variable counts
 					const templateData = JSON.parse(templateId);
-					// const variableCounts = templateData.variable_counts || 0;
 
 					// Convert ResourceMapper value to variables object with bodyN format
 					const variables: Record<string, string> = {};
@@ -789,30 +871,93 @@ export class WhatsAble implements INodeType {
 						variables[`body${index + 1}`] = value;
 					});
 
-					response = await this.helpers.httpRequest({
-						method: 'POST',
-						url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/template',
-						headers: {
-							'Content-Type': 'application/json',
-							'Accept': 'application/json',
-							'Authorization': `Bearer ${apiKey}`,
-						},
-						body: {
+					// Use different API endpoints and data structures based on whether scheduling is enabled
+					if (scheduleMessage) {
+						// For scheduled template messages, use the schedule API
+						const scheduledDateTime = this.getNodeParameter('templateScheduledDateTime', i) as string;
+						const timezone = this.getNodeParameter('templateTimezone', i) as string;
+						
+						// Format the date with milliseconds and Z suffix
+						const formattedDate = new Date(scheduledDateTime).toISOString();
+						
+						// Prepare request body for scheduled message in the specified format
+						const scheduleRequestBody = {
+							template: templateData.template_id,
+							time_zone: timezone,
+							variables: variables,
+							is_schedule: true,
+							phone_number: recipient,
+							schedule_datetime_date: formattedDate, // This will have the format 2025-05-17T12:34:01.186Z
+						};
+
+						response = await this.helpers.httpRequest({
+							method: 'POST',
+							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+								'Authorization': `Bearer ${apiKey}`,
+							},
+							body: scheduleRequestBody,
+						});
+					} else {
+						// For immediate template sending, use the original API
+						const requestBody = {
 							user_id: userId || "efa5aa36-9b42-445c-a6f6-11a26fda86e9",
 							template: templateData.template_id,
 							variables: variables,
 							current_recipient: recipient,
-						},
-					});
+						};
+
+						response = await this.helpers.httpRequest({
+							method: 'POST',
+							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/template',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+								'Authorization': `Bearer ${apiKey}`,
+							},
+							body: requestBody,
+						});
+					}
 				} else if (productType === 'notifyer' && operation === 'sendNonTemplateMessage') {
 					// For notifyer product - non-template message sending
 					const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
 					const messageType = this.getNodeParameter('messageType', i) as string;
+					const scheduleMessage = this.getNodeParameter('scheduleNonTemplateMessage', i, false) as boolean;
+					
+					// Common scheduling properties for all message types
+					let scheduledTime = '';
+					let timezone = '';
+					if (scheduleMessage) {
+						scheduledTime = this.getNodeParameter('nonTemplateScheduledDateTime', i) as string;
+						timezone = this.getNodeParameter('nonTemplateTimezone', i) as string;
+					}
 					
 					// Handle different message types
 					if (messageType === 'text') {
 						const messageContent = this.getNodeParameter('messageContent', i) as string;
 						const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
+						
+						// Prepare request body
+						const requestBody: Record<string, any> = {
+							to: recipient,
+							text: {
+								body: messageContent,
+								preview_url: enableLinkPreview
+							},
+							type: "text",
+							api_key: apiKey,
+							recipient_type: "individual",
+							messaging_product: "whatsapp",
+						};
+						
+						// Add scheduling information if enabled
+						if (scheduleMessage) {
+							requestBody.scheduled = true;
+							requestBody.scheduled_time = scheduledTime;
+							requestBody.timezone = timezone;
+						}
 						
 						// Format text message in the specified format
 						response = await this.helpers.httpRequest({
@@ -823,17 +968,7 @@ export class WhatsAble implements INodeType {
 								'Accept': 'application/json',
 								'Authorization': `Bearer ${apiKey}`,
 							},
-							body: {
-								to: recipient,
-								text: {
-									body: messageContent,
-									preview_url: enableLinkPreview
-								},
-								type: "text",
-								api_key: apiKey,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-							},
+							body: requestBody,
 							returnFullResponse: true,
 						});
 						
@@ -850,7 +985,27 @@ export class WhatsAble implements INodeType {
 						const documentUrl = this.getNodeParameter('documentUrl', i) as string;
 						const documentCaption = this.getNodeParameter('documentCaption', i, '') as string;
 						const documentFilename = this.getNodeParameter('documentFilename', i) as string;
-						// const documentPreviewUrl = this.getNodeParameter('documentPreviewUrl', i, false) as boolean;
+						
+						// Prepare request body
+						const requestBody: Record<string, any> = {
+							to: recipient,
+							type: "document",
+							api_key: apiKey,
+							document: {
+								link: documentUrl,
+								caption: documentCaption,
+								filename: documentFilename
+							},
+							recipient_type: "individual",
+							messaging_product: "whatsapp"
+						};
+						
+						// Add scheduling information if enabled
+						if (scheduleMessage) {
+							requestBody.scheduled = true;
+							requestBody.scheduled_time = scheduledTime;
+							requestBody.timezone = timezone;
+						}
 						
 						// Format document message in the specified format
 						response = await this.helpers.httpRequest({
@@ -861,18 +1016,7 @@ export class WhatsAble implements INodeType {
 								'Accept': 'application/json',
 								'Authorization': `Bearer ${apiKey}`,
 							},
-							body: {
-								to: recipient,
-								type: "document",
-								api_key: apiKey,
-								document: {
-									link: documentUrl,
-									caption: documentCaption,
-									filename: documentFilename
-								},
-								recipient_type: "individual",
-								messaging_product: "whatsapp"
-							},
+							body: requestBody,
 							returnFullResponse: true,
 						});
 						
@@ -888,7 +1032,26 @@ export class WhatsAble implements INodeType {
 					} else if (messageType === 'image') {
 						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
 						const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
-						// const previewUrl = this.getNodeParameter('previewUrl', i, false) as boolean;
+						
+						// Prepare request body
+						const requestBody: Record<string, any> = {
+							to: recipient,
+							type: "image",
+							image: {
+								link: imageUrl,
+								caption: imageCaption
+							},
+							api_key: apiKey,
+							recipient_type: "individual",
+							messaging_product: "whatsapp"
+						};
+						
+						// Add scheduling information if enabled
+						if (scheduleMessage) {
+							requestBody.scheduled = true;
+							requestBody.scheduled_time = scheduledTime;
+							requestBody.timezone = timezone;
+						}
 						
 						// Format image message in the specified format
 						response = await this.helpers.httpRequest({
@@ -899,17 +1062,7 @@ export class WhatsAble implements INodeType {
 								'Accept': 'application/json',
 								'Authorization': `Bearer ${apiKey}`,
 							},
-							body: {
-								to: recipient,
-								type: "image",
-								image: {
-									link: imageUrl,
-									caption: imageCaption
-								},
-								api_key: apiKey,
-								recipient_type: "individual",
-								messaging_product: "whatsapp"
-							},
+							body: requestBody,
 							returnFullResponse: true,
 						});
 						
@@ -925,7 +1078,26 @@ export class WhatsAble implements INodeType {
 					} else if (messageType === 'video') {
 						const videoUrl = this.getNodeParameter('videoUrl', i) as string;
 						const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
-						// const videoPreviewUrl = this.getNodeParameter('videoPreviewUrl', i, false) as boolean;
+						
+						// Prepare request body
+						const requestBody: Record<string, any> = {
+							to: recipient,
+							type: "video",
+							video: {
+								link: videoUrl,
+								caption: videoCaption
+							},
+							api_key: apiKey,
+							recipient_type: "individual",
+							messaging_product: "whatsapp"
+						};
+						
+						// Add scheduling information if enabled
+						if (scheduleMessage) {
+							requestBody.scheduled = true;
+							requestBody.scheduled_time = scheduledTime;
+							requestBody.timezone = timezone;
+						}
 						
 						// Format video message in the specified format
 						response = await this.helpers.httpRequest({
@@ -936,17 +1108,7 @@ export class WhatsAble implements INodeType {
 								'Accept': 'application/json',
 								'Authorization': `Bearer ${apiKey}`,
 							},
-							body: {
-								to: recipient,
-								type: "video",
-								video: {
-									link: videoUrl,
-									caption: videoCaption
-								},
-								api_key: apiKey,
-								recipient_type: "individual",
-								messaging_product: "whatsapp"
-							},
+							body: requestBody,
 							returnFullResponse: true,
 						});
 						
@@ -961,7 +1123,25 @@ export class WhatsAble implements INodeType {
 						}
 					} else if (messageType === 'audio') {
 						const audioUrl = this.getNodeParameter('audioUrl', i) as string;
-						// const audioPreviewUrl = this.getNodeParameter('audioPreviewUrl', i, false) as boolean;
+						
+						// Prepare request body
+						const requestBody: Record<string, any> = {
+							to: recipient,
+							type: "audio",
+							audio: {
+								link: audioUrl
+							},
+							api_key: apiKey,
+							recipient_type: "individual",
+							messaging_product: "whatsapp"
+						};
+						
+						// Add scheduling information if enabled
+						if (scheduleMessage) {
+							requestBody.scheduled = true;
+							requestBody.scheduled_time = scheduledTime;
+							requestBody.timezone = timezone;
+						}
 						
 						// Format audio message in the specified format
 						response = await this.helpers.httpRequest({
@@ -972,16 +1152,7 @@ export class WhatsAble implements INodeType {
 								'Accept': 'application/json',
 								'Authorization': `Bearer ${apiKey}`,
 							},
-							body: {
-								to: recipient,
-								type: "audio",
-								audio: {
-									link: audioUrl
-								},
-								api_key: apiKey,
-								recipient_type: "individual",
-								messaging_product: "whatsapp"
-							},
+							body: requestBody,
 							returnFullResponse: true,
 						});
 						

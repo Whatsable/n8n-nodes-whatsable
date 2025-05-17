@@ -26,7 +26,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && gulp build:icons",
-    "dev": "nodemon -w nodes -w credentials --ext ts --exec 'tsc && N8N_CUSTOM_EXTENSIONS=\"/Users/younusaliakash/.n8n/custom\" n8n'",
+    "dev": "nodemon -w nodes -w credentials --ext ts --exec \"tsc && n8n\"",
     "format": "prettier nodes credentials tests --write",
     "lint": "eslint nodes credentials tests package.json",
     "lintfix": "eslint nodes credentials tests package.json --fix",

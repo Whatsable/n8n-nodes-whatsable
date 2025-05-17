@@ -18,7 +18,7 @@ export class WhatsAbleTrigger implements INodeType {
             name: 'WhatsAble Trigger',
         },
         inputs: [],
-        outputs: ['main'],
+        outputs: [{ type: 'main' }],
         credentials: [
             {
                 name: 'whatsAbleTriggerApi',
