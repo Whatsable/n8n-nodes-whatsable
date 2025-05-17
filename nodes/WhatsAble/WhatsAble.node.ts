@@ -932,6 +932,8 @@ export class WhatsAble implements INodeType {
 					if (scheduleMessage) {
 						scheduledTime = this.getNodeParameter('nonTemplateScheduledDateTime', i) as string;
 						timezone = this.getNodeParameter('nonTemplateTimezone', i) as string;
+						// Format the date with milliseconds and Z suffix
+						scheduledTime = new Date(scheduledTime).toISOString();
 					}
 					
 					// Handle different message types
@@ -939,86 +941,120 @@ export class WhatsAble implements INodeType {
 						const messageContent = this.getNodeParameter('messageContent', i) as string;
 						const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
 						
-						// Prepare request body
-						const requestBody: Record<string, any> = {
-							to: recipient,
-							text: {
-								body: messageContent,
-								preview_url: enableLinkPreview
-							},
-							type: "text",
-							api_key: apiKey,
-							recipient_type: "individual",
-							messaging_product: "whatsapp",
-						};
-						
-						// Add scheduling information if enabled
 						if (scheduleMessage) {
-							requestBody.scheduled = true;
-							requestBody.scheduled_time = scheduledTime;
-							requestBody.timezone = timezone;
-						}
-						
-						// Format text message in the specified format
-						response = await this.helpers.httpRequest({
-							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							body: requestBody,
-							returnFullResponse: true,
-						});
-						
-						// Log the full response for debugging
-						console.log('Text message API response:', JSON.stringify(response));
-						
-						// Check if the response contains a message indicating an error
-						if (response && response.body && response.body.message) {
-							throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						} else if (response && response.message) {
-							throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
+							// For scheduled non-template messages, use the schedule/non-template API
+							const scheduleRequestBody = {
+								to: recipient,
+								text: {
+									body: messageContent,
+									preview_url: enableLinkPreview
+								},
+								type: "text",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: scheduledTime
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							});
+						} else {
+							// For immediate sending, use the original API
+							const requestBody: Record<string, any> = {
+								to: recipient,
+								text: {
+									body: messageContent,
+									preview_url: enableLinkPreview
+								},
+								type: "text",
+								api_key: apiKey,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: requestBody,
+								returnFullResponse: true,
+							});
 						}
 					} else if (messageType === 'document') {
 						const documentUrl = this.getNodeParameter('documentUrl', i) as string;
 						const documentCaption = this.getNodeParameter('documentCaption', i, '') as string;
 						const documentFilename = this.getNodeParameter('documentFilename', i) as string;
 						
-						// Prepare request body
-						const requestBody: Record<string, any> = {
-							to: recipient,
-							type: "document",
-							api_key: apiKey,
-							document: {
-								link: documentUrl,
-								caption: documentCaption,
-								filename: documentFilename
-							},
-							recipient_type: "individual",
-							messaging_product: "whatsapp"
-						};
-						
-						// Add scheduling information if enabled
 						if (scheduleMessage) {
-							requestBody.scheduled = true;
-							requestBody.scheduled_time = scheduledTime;
-							requestBody.timezone = timezone;
+							// For scheduled document messages, use the schedule/non-template API
+							const scheduleRequestBody = {
+								to: recipient,
+								document: {
+									link: documentUrl,
+									caption: documentCaption,
+									filename: documentFilename
+								},
+								type: "document",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: scheduledTime
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							});
+						} else {
+							// For immediate sending, use the original API
+							const requestBody: Record<string, any> = {
+								to: recipient,
+								type: "document",
+								document: {
+									link: documentUrl,
+									caption: documentCaption,
+									filename: documentFilename
+								},
+								api_key: apiKey,
+								recipient_type: "individual",
+								messaging_product: "whatsapp"
+							};
+							
+							// Format document message in the specified format
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: requestBody,
+								returnFullResponse: true,
+							});
 						}
-						
-						// Format document message in the specified format
-						response = await this.helpers.httpRequest({
-							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							body: requestBody,
-							returnFullResponse: true,
-						});
 						
 						// Log the full response for debugging
 						console.log('Document message API response:', JSON.stringify(response));
@@ -1033,38 +1069,60 @@ export class WhatsAble implements INodeType {
 						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
 						const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
 						
-						// Prepare request body
-						const requestBody: Record<string, any> = {
-							to: recipient,
-							type: "image",
-							image: {
-								link: imageUrl,
-								caption: imageCaption
-							},
-							api_key: apiKey,
-							recipient_type: "individual",
-							messaging_product: "whatsapp"
-						};
-						
-						// Add scheduling information if enabled
 						if (scheduleMessage) {
-							requestBody.scheduled = true;
-							requestBody.scheduled_time = scheduledTime;
-							requestBody.timezone = timezone;
+							// For scheduled image messages, use the schedule/non-template API
+							const scheduleRequestBody = {
+								to: recipient,
+								image: {
+									link: imageUrl,
+									caption: imageCaption
+								},
+								type: "image",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: scheduledTime
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							});
+						} else {
+							// For immediate sending, use the original API
+							const requestBody: Record<string, any> = {
+								to: recipient,
+								type: "image",
+								image: {
+									link: imageUrl,
+									caption: imageCaption
+								},
+								api_key: apiKey,
+								recipient_type: "individual",
+								messaging_product: "whatsapp"
+							};
+							
+							// Format image message in the specified format
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: requestBody,
+								returnFullResponse: true,
+							});
 						}
-						
-						// Format image message in the specified format
-						response = await this.helpers.httpRequest({
-							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							body: requestBody,
-							returnFullResponse: true,
-						});
 						
 						// Log the full response for debugging
 						console.log('Image message API response:', JSON.stringify(response));
@@ -1079,38 +1137,60 @@ export class WhatsAble implements INodeType {
 						const videoUrl = this.getNodeParameter('videoUrl', i) as string;
 						const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
 						
-						// Prepare request body
-						const requestBody: Record<string, any> = {
-							to: recipient,
-							type: "video",
-							video: {
-								link: videoUrl,
-								caption: videoCaption
-							},
-							api_key: apiKey,
-							recipient_type: "individual",
-							messaging_product: "whatsapp"
-						};
-						
-						// Add scheduling information if enabled
 						if (scheduleMessage) {
-							requestBody.scheduled = true;
-							requestBody.scheduled_time = scheduledTime;
-							requestBody.timezone = timezone;
+							// For scheduled video messages, use the schedule/non-template API
+							const scheduleRequestBody = {
+								to: recipient,
+								video: {
+									link: videoUrl,
+									caption: videoCaption
+								},
+								type: "video",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: scheduledTime
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							});
+						} else {
+							// For immediate sending, use the original API
+							const requestBody: Record<string, any> = {
+								to: recipient,
+								type: "video",
+								video: {
+									link: videoUrl,
+									caption: videoCaption
+								},
+								api_key: apiKey,
+								recipient_type: "individual",
+								messaging_product: "whatsapp"
+							};
+							
+							// Format video message in the specified format
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: requestBody,
+								returnFullResponse: true,
+							});
 						}
-						
-						// Format video message in the specified format
-						response = await this.helpers.httpRequest({
-							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							body: requestBody,
-							returnFullResponse: true,
-						});
 						
 						// Log the full response for debugging
 						console.log('Video message API response:', JSON.stringify(response));
@@ -1124,37 +1204,58 @@ export class WhatsAble implements INodeType {
 					} else if (messageType === 'audio') {
 						const audioUrl = this.getNodeParameter('audioUrl', i) as string;
 						
-						// Prepare request body
-						const requestBody: Record<string, any> = {
-							to: recipient,
-							type: "audio",
-							audio: {
-								link: audioUrl
-							},
-							api_key: apiKey,
-							recipient_type: "individual",
-							messaging_product: "whatsapp"
-						};
-						
-						// Add scheduling information if enabled
 						if (scheduleMessage) {
-							requestBody.scheduled = true;
-							requestBody.scheduled_time = scheduledTime;
-							requestBody.timezone = timezone;
+							// For scheduled audio messages, use the schedule/non-template API
+							const scheduleRequestBody = {
+								to: recipient,
+								audio: {
+									link: audioUrl
+								},
+								type: "audio",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: scheduledTime
+							};
+							
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							});
+						} else {
+							// For immediate sending, use the original API
+							const requestBody: Record<string, any> = {
+								to: recipient,
+								type: "audio",
+								audio: {
+									link: audioUrl
+								},
+								api_key: apiKey,
+								recipient_type: "individual",
+								messaging_product: "whatsapp"
+							};
+							
+							// Format audio message in the specified format
+							response = await this.helpers.httpRequest({
+								method: 'POST',
+								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+									'Authorization': `Bearer ${apiKey}`,
+								},
+								body: requestBody,
+								returnFullResponse: true,
+							});
 						}
-						
-						// Format audio message in the specified format
-						response = await this.helpers.httpRequest({
-							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							body: requestBody,
-							returnFullResponse: true,
-						});
 						
 						// Log the full response for debugging
 						console.log('Audio message API response:', JSON.stringify(response));
