@@ -6,7 +6,7 @@ import {
 
 export class WhatsAbleNotifyerApi implements ICredentialType {
     name = 'whatsAbleTriggerApi';
-    displayName = 'WhatsAble API';
+    displayName = 'WhatsAble Notifyer System API';
     documentationUrl = 'https://docs.whatsable.app/n8n-overview';
     
     // Properties shown in the credentials dialog
