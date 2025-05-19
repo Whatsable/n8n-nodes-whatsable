@@ -5,23 +5,23 @@ import {
     IWebhookResponseData,
 } from 'n8n-workflow';
 
-export class WhatsAbleNotifierTrigger implements INodeType {
+export class WhatsAbleNotifyerTrigger implements INodeType {
     description: INodeTypeDescription = {
-        displayName: 'Notifier Incoming Message from Recipient',
-        name: 'whatsAbleNotifierTrigger',
+        displayName: 'Notifyer System Incoming Message from Recipient',
+        name: 'whatsAbleTrigger',
         icon: 'file:whatsable.svg',
         group: ['trigger', 'whatsable', 'whatsableTrigger'],
         version: 1,
         subtitle: '={{$parameter["httpMethod"] + ": " + $parameter["path"]}}',
-        description: 'Incoming Message From WhatsAble Notifier',
+        description: 'Incoming Message From recipient',
         defaults: {
-            name: 'WhatsAble Notifier Trigger',
+            name: 'WhatsAble Trigger',
         },
         inputs: [],
         outputs: [{ type: 'main' }],
         credentials: [
             {
-                name: 'whatsAbleNotifierApi',
+                name: 'whatsAbleTriggerApi',
                 required: true,
             },
         ],
@@ -30,7 +30,7 @@ export class WhatsAbleNotifierTrigger implements INodeType {
                 name: 'default',
                 httpMethod: '={{$parameter["httpMethod"]}}',
                 responseMode: '={{$parameter["responseMode"]}}',
-                path: 'whatsable-notifier-webhook',
+                path: 'whatsable-webhook',
                 isFullPath: false,
             },
         ],
@@ -74,29 +74,10 @@ export class WhatsAbleNotifierTrigger implements INodeType {
     async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
         // Get the webhook data
         const webhookData = this.getRequestObject().body;
-        const credentials = await this.getCredentials('whatsAbleNotifierApi');
-        
-        // Register the webhook URL with the API
-        try {
-            await this.helpers.httpRequest({
-                method: 'POST',
-                url: 'https://api.insightssystem.com/api:gncnl2D6/n8n/notifier/webhook',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': credentials.apiKey as string,
-                },
-                body: {
-                    url: credentials.productionWebhookUrl,
-                },
-            });
-        } catch (error) {
-            // Log the error but don't fail the webhook
-            console.error('Failed to register webhook URL:', error);
-        }
         
         // Return the webhook data to be processed by n8n workflow
         return {
             workflowData: [this.helpers.returnJsonArray(webhookData)],
         };
     }
-} 
+}

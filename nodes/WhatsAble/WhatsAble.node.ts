@@ -17,7 +17,7 @@ export class WhatsAble implements INodeType {
 		displayName: 'WhatsAble',
 		name: 'whatsAble',
 		icon: 'file:whatsable.svg',
-		group: ['transform'],
+		group: ['action', 'whatsable', 'whatsableAction'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
 		description: 'Automate WhatsApp messages',

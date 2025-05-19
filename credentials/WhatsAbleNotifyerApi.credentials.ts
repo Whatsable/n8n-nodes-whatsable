@@ -4,7 +4,7 @@ import {
     ICredentialTestRequest,
 } from 'n8n-workflow';
 
-export class WhatsAbleTriggerApi implements ICredentialType {
+export class WhatsAbleNotifyerApi implements ICredentialType {
     name = 'whatsAbleTriggerApi';
     displayName = 'WhatsAble API';
     documentationUrl = 'https://docs.whatsable.app/n8n-overview';
