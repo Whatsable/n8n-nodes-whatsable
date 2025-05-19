@@ -165,6 +165,21 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
+				displayName: 'Note',
+				name: 'templateNote',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						operation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'Optional note to add to the template message',
+				typeOptions: {
+					rows: 2,
+				},
+			},
+			{
 				displayName: 'Would you like to schedule a message?',
 				name: 'scheduleTemplateMessage',
 				type: 'boolean',
@@ -204,6 +219,7 @@ export class WhatsAble implements INodeType {
 				default: 'Asia/Dhaka',
 				description: 'Timezone for the scheduled date and time',
 			},
+			
 
 			// Fields for whatsable product
 			{
@@ -861,6 +877,7 @@ export class WhatsAble implements INodeType {
 					const templateId = this.getNodeParameter('notifyerTemplate', i) as string;
 					const variablesObj = this.getNodeParameter('notifyerVariables', i) as { value: Record<string, string> };
 					const scheduleMessage = this.getNodeParameter('scheduleTemplateMessage', i, false) as boolean;
+					const note = this.getNodeParameter('templateNote', i, '') as string;
 
 					// Get template data to validate variable counts
 					const templateData = JSON.parse(templateId);
@@ -887,7 +904,8 @@ export class WhatsAble implements INodeType {
 							variables: variables,
 							is_schedule: true,
 							phone_number: recipient,
-							schedule_datetime_date: formattedDate, // This will have the format 2025-05-17T12:34:01.186Z
+							schedule_datetime_date: formattedDate,
+							note: note,
 						};
 
 						response = await this.helpers.httpRequest({
@@ -906,12 +924,13 @@ export class WhatsAble implements INodeType {
 							user_id: userId || "efa5aa36-9b42-445c-a6f6-11a26fda86e9",
 							template: templateData.template_id,
 							variables: variables,
-							current_recipient: recipient,
+							phone_number: recipient,
+							note: note,
 						};
 
 						response = await this.helpers.httpRequest({
 							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/template',
+							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
