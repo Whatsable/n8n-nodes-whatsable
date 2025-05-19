@@ -180,6 +180,21 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
+				displayName: 'Labels',
+				name: 'templateLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						operation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'Select one or more labels to add to the message',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
+				},
+			},
+			{
 				displayName: 'Would you like to schedule a message?',
 				name: 'scheduleTemplateMessage',
 				type: 'boolean',
@@ -517,6 +532,21 @@ export class WhatsAble implements INodeType {
 				default: '',
 			},
 			{
+				displayName: 'Labels',
+				name: 'nonTemplateLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						operation: ['sendNonTemplateMessage'],
+					},
+				},
+				description: 'Select one or more labels to add to the message',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
+				},
+			},
+			{
 				displayName: 'Would you like to schedule a message?',
 				name: 'scheduleNonTemplateMessage',
 				type: 'boolean',
@@ -795,6 +825,71 @@ export class WhatsAble implements INodeType {
 
 				return returnData;
 			},
+
+			async getLabels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				try {
+					// Get credentials
+					const credentials = await this.getCredentials('whatsAbleApi');
+					const apiKey = credentials.apiKey as string;
+
+					// First get user ID from validation API
+					const validationResponse = await this.helpers.httpRequest({
+						method: 'GET',
+						url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+						headers: {
+							'Accept': 'application/json',
+						},
+					});
+
+					if (!validationResponse.success || !validationResponse.apiData?.user_id) {
+						returnData.push({
+							name: 'Error: Could not get user ID',
+							value: 'error',
+							description: 'Failed to get user ID from API',
+						});
+						return returnData;
+					}
+
+					// Get labels using the user ID
+					const response = await this.helpers.httpRequest({
+						method: 'GET',
+						url: `https://api.insightssystem.com/api:ErOQ8pSj/n8n/label?user_id=${validationResponse.apiData.user_id}`,
+						headers: {
+							'Accept': 'application/json',
+							'Authorization': `Bearer ${apiKey}`,
+						},
+					});
+
+					// Process labels from response
+					if (Array.isArray(response)) {
+						for (const label of response) {
+							if (label.label) {
+								returnData.push({
+									name: label.label,
+									value: label.label,
+									description: 'Label',
+								});
+							}
+						}
+					} else {
+						returnData.push({
+							name: 'No labels found',
+							value: 'notfound',
+							description: 'No labels were found for this user',
+						});
+					}
+				} catch (error) {
+					returnData.push({
+						name: `Error: ${error.message}`,
+						value: 'error',
+						description: 'Failed to load labels',
+					});
+				}
+
+				return returnData;
+			},
 		},
 		resourceMapping: {
 			getTemplateVariables,
@@ -878,6 +973,7 @@ export class WhatsAble implements INodeType {
 					const variablesObj = this.getNodeParameter('notifyerVariables', i) as { value: Record<string, string> };
 					const scheduleMessage = this.getNodeParameter('scheduleTemplateMessage', i, false) as boolean;
 					const note = this.getNodeParameter('templateNote', i, '') as string;
+					const labels = this.getNodeParameter('templateLabels', i, []) as string[];
 
 					// Get template data to validate variable counts
 					const templateData = JSON.parse(templateId);
@@ -906,6 +1002,7 @@ export class WhatsAble implements INodeType {
 							phone_number: recipient,
 							schedule_datetime_date: formattedDate,
 							note: note,
+							labels: labels,
 						};
 
 						response = await this.helpers.httpRequest({
@@ -926,6 +1023,7 @@ export class WhatsAble implements INodeType {
 							variables: variables,
 							phone_number: recipient,
 							note: note,
+							labels: labels,
 						};
 
 						response = await this.helpers.httpRequest({
@@ -944,6 +1042,7 @@ export class WhatsAble implements INodeType {
 					const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
 					const messageType = this.getNodeParameter('messageType', i) as string;
 					const scheduleMessage = this.getNodeParameter('scheduleNonTemplateMessage', i, false) as boolean;
+					const labels = this.getNodeParameter('nonTemplateLabels', i, []) as string[];
 					
 					// Common scheduling properties for all message types
 					let scheduledTime = '';
@@ -973,7 +1072,8 @@ export class WhatsAble implements INodeType {
 								is_schedule: true,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
-								schedule_datetime_date: scheduledTime
+								schedule_datetime_date: scheduledTime,
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -999,6 +1099,7 @@ export class WhatsAble implements INodeType {
 								api_key: apiKey,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -1032,7 +1133,8 @@ export class WhatsAble implements INodeType {
 								is_schedule: true,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
-								schedule_datetime_date: scheduledTime
+								schedule_datetime_date: scheduledTime,
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -1058,7 +1160,8 @@ export class WhatsAble implements INodeType {
 								},
 								api_key: apiKey,
 								recipient_type: "individual",
-								messaging_product: "whatsapp"
+								messaging_product: "whatsapp",
+								labels: labels,
 							};
 							
 							// Format document message in the specified format
@@ -1101,7 +1204,8 @@ export class WhatsAble implements INodeType {
 								is_schedule: true,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
-								schedule_datetime_date: scheduledTime
+								schedule_datetime_date: scheduledTime,
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -1126,7 +1230,8 @@ export class WhatsAble implements INodeType {
 								},
 								api_key: apiKey,
 								recipient_type: "individual",
-								messaging_product: "whatsapp"
+								messaging_product: "whatsapp",
+								labels: labels,
 							};
 							
 							// Format image message in the specified format
@@ -1169,7 +1274,8 @@ export class WhatsAble implements INodeType {
 								is_schedule: true,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
-								schedule_datetime_date: scheduledTime
+								schedule_datetime_date: scheduledTime,
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -1194,7 +1300,8 @@ export class WhatsAble implements INodeType {
 								},
 								api_key: apiKey,
 								recipient_type: "individual",
-								messaging_product: "whatsapp"
+								messaging_product: "whatsapp",
+								labels: labels,
 							};
 							
 							// Format video message in the specified format
@@ -1235,7 +1342,8 @@ export class WhatsAble implements INodeType {
 								is_schedule: true,
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
-								schedule_datetime_date: scheduledTime
+								schedule_datetime_date: scheduledTime,
+								labels: labels,
 							};
 							
 							response = await this.helpers.httpRequest({
@@ -1259,7 +1367,8 @@ export class WhatsAble implements INodeType {
 								},
 								api_key: apiKey,
 								recipient_type: "individual",
-								messaging_product: "whatsapp"
+								messaging_product: "whatsapp",
+								labels: labels,
 							};
 							
 							// Format audio message in the specified format
