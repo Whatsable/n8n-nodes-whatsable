@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="nodes/WhatsAble/whatsable.png" alt="WhatsAble Logo" width="160"/>
+  <img src="/dist/nodes/WhatsAble/whatsable.png" alt="WhatsAble Logo" width="160"/>
 </p>
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
@@ -55,7 +55,7 @@ The WhatsAble Suite offers a comprehensive set of messaging tools that integrate
 - Advanced template capabilities
 - Full media support
 - Enterprise pricing
-- Contact sales for trial
+- Try for free with 2 numbers
 - [Documentation](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
 
 ---
@@ -139,13 +139,6 @@ To use this node, you need to have an API key from your chosen WhatsAble Suite p
 6. Click "Test Step" to verify
 7. Save your workflow and activate it
 
-### Best Practices for WhatsAble Node
-- Always use country codes with phone numbers
-- Test messages with small groups first
-- Implement error handling in your workflows
-- Use dynamic data from previous nodes when possible
-- Keep your API key secure and never share it publicly
-
 For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs.whatsable.app/guides/whatsable/n8n)
 
 ---
@@ -221,14 +214,6 @@ For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs
 - Event Reminders: Trigger on calendar event, send reminder with RSVP link
 - Customer Feedback: Trigger on purchase, send feedback request
 - Support Ticket Updates: Trigger on ticket status change, send update
-
-### Best Practices for Notifier Node
-- Keep business information up to date
-- Use templates for consistent messaging
-- Implement proper error handling
-- Test workflows with small groups first
-- Monitor message delivery status
-- Maintain compliance with WhatsApp policies
 
 For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.whatsable.app/guides/notifier/n8n)
 
@@ -307,16 +292,6 @@ For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.
 - Lead Notifications: Trigger on new CRM lead, send non-template message
 - Customer Support: Trigger on new support ticket, send template message
 - Delivery Updates: Trigger on shipping status change, send template message
-
-### Best Practices for Notifyer System Node
-- Keep templates compliant with WhatsApp policies
-- Use appropriate message types for different scenarios
-- Implement proper error handling
-- Monitor template approval status
-- Test workflows with small groups first
-- Maintain message logs for compliance
-- Use dynamic data from previous nodes
-- Keep API key secure
 
 For detailed documentation, visit [Notifyer System n8n Integration Guide](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
 
