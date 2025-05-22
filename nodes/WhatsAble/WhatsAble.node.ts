@@ -24,8 +24,8 @@ export class WhatsAble implements INodeType {
 		defaults: {
 			name: 'WhatsAble',
 		},
-		inputs: [{ type: 'main' }],
-		outputs: [{ type: 'main' }],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'whatsAbleApi',
@@ -180,7 +180,7 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
-				displayName: 'Labels',
+				displayName: 'Label Names or IDs',
 				name: 'templateLabels',
 				type: 'multiOptions',
 				default: [],
@@ -189,13 +189,13 @@ export class WhatsAble implements INodeType {
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
-				description: 'Select one or more labels to add to the message',
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getLabels',
 				},
 			},
 			{
-				displayName: 'Would you like to schedule a message?',
+				displayName: 'Schedule Message',
 				name: 'scheduleTemplateMessage',
 				type: 'boolean',
 				default: false,
@@ -532,7 +532,7 @@ export class WhatsAble implements INodeType {
 				default: '',
 			},
 			{
-				displayName: 'Labels',
+				displayName: 'Label Names or IDs',
 				name: 'nonTemplateLabels',
 				type: 'multiOptions',
 				default: [],
@@ -541,13 +541,13 @@ export class WhatsAble implements INodeType {
 						operation: ['sendNonTemplateMessage'],
 					},
 				},
-				description: 'Select one or more labels to add to the message',
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getLabels',
 				},
 			},
 			{
-				displayName: 'Would you like to schedule a message?',
+				displayName: 'Schedule Message',
 				name: 'scheduleNonTemplateMessage',
 				type: 'boolean',
 				default: false,

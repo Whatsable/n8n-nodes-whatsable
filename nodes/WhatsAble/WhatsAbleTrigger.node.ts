@@ -18,7 +18,7 @@ export class WhatsAbleTrigger implements INodeType {
             name: 'WhatsAble Trigger',
         },
         inputs: [],
-        outputs: [{ type: 'main' }],
+        outputs: ['main'],
         credentials: [
             {
                 name: 'whatsAbleTriggerApi',
@@ -65,17 +65,17 @@ export class WhatsAbleTrigger implements INodeType {
                 type: 'options',
                 options: [
                     {
-                        name: 'Whatsable Incoming Message from Recipient',
+                        name: 'WhatsAble Incoming Message From Recipient',
                         value: 'whatsableTrigger',
                         description: 'Incoming Message From Whatsable',
                     },
                     {
-                        name: 'Notifier Incoming Message from Recipient',
+                        name: 'Notifier Incoming Message From Recipient',
                         value: 'notifier',
                         description: 'Incoming Message From WhatsAble Notifier',
                     },
                     {
-                        name: 'Notifyer System Incoming Message from Recipient',
+                        name: 'Notifyer System Incoming Message From Recipient',
                         value: 'notifyer',
                         description: 'Incoming Message From recipient',
                     }
