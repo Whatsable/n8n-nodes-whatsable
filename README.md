@@ -1,6 +1,6 @@
 # n8n-nodes-whatsable
 
-![WhatsAble Logo](nodes/WhatsAble/whatsAble.svg)
+![WhatsAble Logo](nodes/WhatsAble/whatsable.png)
 
 This n8n node allows you to integrate WhatsApp messaging capabilities into your n8n workflows using the WhatsAble API.
 
