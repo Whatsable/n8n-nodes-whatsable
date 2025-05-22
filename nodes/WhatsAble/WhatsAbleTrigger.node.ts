@@ -65,7 +65,7 @@ export class WhatsAbleTrigger implements INodeType {
                 type: 'options',
                 options: [
                     {
-                        name: 'WhatsAble Incoming Message From Recipient',
+                        name: 'Whatsable Incoming Message From Recipient',
                         value: 'whatsableTrigger',
                         description: 'Incoming Message From Whatsable',
                     },
