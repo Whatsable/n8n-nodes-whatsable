@@ -83,7 +83,7 @@ To use this node, you need to have an API key from your chosen WhatsAble Suite p
 
 ### WhatsAble Node
 - Send messages
-- Send template messages
+- Send template messages (Via Notifyer System)
 - Send non-template messages
 - Schedule messages
 - Support for various media types
