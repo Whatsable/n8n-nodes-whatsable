@@ -4,9 +4,9 @@ import {
     ICredentialTestRequest,
 } from 'n8n-workflow';
 
-export class WhatsAbleNotifyerApi implements ICredentialType {
-    name = 'whatsAbleNotifyerApi';
-    displayName = 'WhatsAble Notifyer System API';
+export class WhatsAbleTriggerApi implements ICredentialType {
+    name = 'whatsAbleTriggerApi';
+    displayName = 'WhatsAble API';
     documentationUrl = 'https://docs.whatsable.app/n8n-overview';
     
     // Properties shown in the credentials dialog
@@ -15,10 +15,10 @@ export class WhatsAbleNotifyerApi implements ICredentialType {
             displayName: 'API Key',
             name: 'apiKey',
             type: 'string',
-			typeOptions: { password: true },
+            typeOptions: { password: true },
             default: '',
             required: true,
-            description: 'API Key for WhatsAble',
+            description: 'API Key for WhatsAble Trigger',
         },
         {
             displayName: 'Production Webhook URL',
@@ -30,22 +30,19 @@ export class WhatsAbleNotifyerApi implements ICredentialType {
         }
     ];
 
-    // Fixed forward URL - not user configurable
-    forwardUrl = 'https://api.insightssystem.com/api:dBShrB6H/n8n';
-
     // This method is called when the "Test" button is clicked
     test: ICredentialTestRequest = {
         request: {
-            baseURL: this.forwardUrl,
-            url: '',
+            baseURL: 'https://api.insightssystem.com/api:KXAU3bZ4',
+            url: '/n8n/webhook',
             method: 'POST',
             body: {
-                hookUrl: '={{$credentials.productionWebhookUrl}}',
-                api_key: '={{$credentials.apiKey}}'
+                url: '={{$credentials.productionWebhookUrl}}'
             },
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': '={{$credentials.apiKey}}'
             }
         }
     };
-}
+} 

@@ -44,7 +44,8 @@
     "n8nNodesApiVersion": 1,
     "credentials": [
       "dist/credentials/WhatsAbleApi.credentials.js",
-      "dist/credentials/WhatsAbleNotifyerApi.credentials.credentials.js"
+      "dist/credentials/WhatsAbleNotifyerApi.credentials.js",
+      "dist/credentials/WhatsAbleTriggerApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/WhatsAble/WhatsAble.node.js",

@@ -21,6 +21,15 @@ export class WhatsAbleTrigger implements INodeType {
         outputs: [{ type: 'main' }],
         credentials: [
             {
+                name: 'whatsAbleTriggerApi',
+                required: false,
+                displayOptions: {
+                    show: {
+                        event: ['whatsableTrigger'],
+                    },
+                },
+            },
+            {
                 name: 'whatsAbleNotifierApi',
                 required: false,
                 displayOptions: {
@@ -30,7 +39,7 @@ export class WhatsAbleTrigger implements INodeType {
                 },
             },
             {
-                name: 'whatsAbleTriggerApi',
+                name: 'whatsAbleNotifyerApi',
                 required: false,
                 displayOptions: {
                     show: {
@@ -38,6 +47,7 @@ export class WhatsAbleTrigger implements INodeType {
                     },
                 },
             },
+            
         ],
         webhooks: [
             {
@@ -55,6 +65,11 @@ export class WhatsAbleTrigger implements INodeType {
                 type: 'options',
                 options: [
                     {
+                        name: 'Whatsable Incoming Message from Recipient',
+                        value: 'whatsableTrigger',
+                        description: 'Incoming Message From Whatsable',
+                    },
+                    {
                         name: 'Notifier Incoming Message from Recipient',
                         value: 'notifier',
                         description: 'Incoming Message From WhatsAble Notifier',
@@ -63,9 +78,10 @@ export class WhatsAbleTrigger implements INodeType {
                         name: 'Notifyer System Incoming Message from Recipient',
                         value: 'notifyer',
                         description: 'Incoming Message From recipient',
-                    },
+                    }
+                    
                 ],
-                default: 'notifier',
+                default: 'whatsableTrigger',
                 description: 'Choose which event to trigger on',
             },
             {
@@ -128,7 +144,7 @@ export class WhatsAbleTrigger implements INodeType {
             }
         } else if (event === 'notifyer') {
             // Notifyer registration logic
-            const credentials = await this.getCredentials('whatsAbleTriggerApi');
+            const credentials = await this.getCredentials('whatsAbleNotifyerApi');
             try {
                 await this.helpers.httpRequest({
                     method: 'POST',
@@ -145,6 +161,25 @@ export class WhatsAbleTrigger implements INodeType {
             } catch (error) {
                 // Log the error but don't fail the webhook
                 console.error('Failed to register notifyer webhook URL:', error);
+            }
+        } else if (event === 'whatsableTrigger') {
+            // WhatsAble Trigger registration logic
+            const credentials = await this.getCredentials('whatsAbleTriggerApi');
+            try {
+                await this.helpers.httpRequest({
+                    method: 'POST',
+                    url: 'https://api.insightssystem.com/api:KXAU3bZ4/n8n/webhook',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': credentials.apiKey as string,
+                    },
+                    body: {
+                        url: credentials.productionWebhookUrl,
+                    },
+                });
+            } catch (error) {
+                // Log the error but don't fail the webhook
+                console.error('Failed to register WhatsAble Trigger webhook URL:', error);
             }
         }
 
