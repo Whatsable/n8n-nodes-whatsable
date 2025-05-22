@@ -176,13 +176,6 @@ For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs
    - Toggle "Active" to start receiving messages
    - Connect the trigger to any action node to process incoming messages
 
-### Best Practices for WhatsAble Trigger Node
-- Keep your webhook URL secure
-- Implement proper error handling
-- Monitor incoming message volume
-- Set up appropriate response workflows
-- Test the trigger with sample messages
-
 For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs.whatsable.app/guides/whatsable/n8n)
 
 ---
@@ -266,13 +259,6 @@ For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.
    - Save your workflow
    - Toggle "Active" to start receiving messages
    - Connect the trigger to any action node to process incoming messages
-
-### Best Practices for Notifier Trigger Node
-- Keep your webhook URL secure
-- Implement proper error handling
-- Monitor incoming message volume
-- Set up appropriate response workflows
-- Test the trigger with sample messages
 
 For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.whatsable.app/guides/notifier/n8n)
 
@@ -362,14 +348,6 @@ For detailed documentation, visit [Notifyer System n8n Integration Guide](https:
    - Toggle "Active" to start receiving messages
    - Connect the trigger to any action node to process incoming messages
 
-### Best Practices for Notifyer System Trigger Node
-- Keep your webhook URL secure
-- Implement proper error handling
-- Monitor incoming message volume
-- Set up appropriate response workflows
-- Test the trigger with sample messages
-- Ensure compliance with WhatsApp Business Platform policies
-
 For detailed documentation, visit [Notifyer System n8n Integration Guide](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
 
 ---
@@ -381,28 +359,6 @@ For detailed documentation, visit [Notifyer System n8n Integration Guide](https:
 - Appointment Reminders: Automated reminders, confirmations, calendar integration
 - Customer Support: Ticket routing, automated responses, support updates
 - Payment Reminders: Invoice notifications, payment confirmations, subscription reminders
-
----
-
-## Best Practices
-
-### Message Content
-- Keep messages concise and clear
-- Use templates for consistent messaging
-- Include clear call-to-actions
-- Follow WhatsApp's messaging guidelines
-
-### Workflow Design
-- Implement error handling
-- Add appropriate delays between messages
-- Use webhooks for real-time updates
-- Test workflows thoroughly before deployment
-
-### Compliance
-- Obtain necessary permissions
-- Follow WhatsApp's business policies
-- Implement opt-out mechanisms
-- Maintain message logs
 
 ---
 
