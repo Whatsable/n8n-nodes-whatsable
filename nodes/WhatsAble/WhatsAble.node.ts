@@ -7,17 +7,26 @@ import {
 	NodeOperationError,
 	INodePropertyOptions,
 	ResourceMapperFields,
-	NodeApiError
+	NodeApiError,
+	IHttpRequestOptions,
 } from 'n8n-workflow';
 
 import { WHATSAPP_TIMEZONES } from './timezones';
+
+// Base URLs for different endpoints
+const BASE_URLS = {
+	VALIDATION: 'https://api.insightssystem.com/api:gncnl2D6',
+	NOTIFIER: 'https://api.insightssystem.com/api:gncnl2D6',
+	NOTIFYER: 'https://api.insightssystem.com/api:ErOQ8pSj',
+	WHATSABLE: 'https://api.insightssystem.com/api:YyPzWfoq',
+} as const;
 
 export class WhatsAble implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'WhatsAble',
 		name: 'whatsAble',
 		icon: 'file:whatsable.svg',
-		group: ['action', 'whatsable', 'whatsableAction'],
+		group: ['action'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
 		description: 'Automate WhatsApp messages',
@@ -34,7 +43,7 @@ export class WhatsAble implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Operation Name or ID',
+				displayName: 'Operation5 Name or ID',
 				name: 'operation',
 				type: 'options',
 				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
@@ -614,13 +623,16 @@ export class WhatsAble implements INodeType {
 
 					// Make API call to validate credentials and get product info
 					const apiKey = credentials.apiKey as string;
-					const response = await this.helpers.httpRequest({
+					const options: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+						baseURL: BASE_URLS.VALIDATION,
+						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
 						headers: {
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const response = await this.helpers.httpRequest(options);
 
 					if (!response.success) {
 						// If validation failed, show the error message
@@ -688,13 +700,16 @@ export class WhatsAble implements INodeType {
 					const apiKey = credentials.apiKey as string;
 
 					// First get user ID from validation API
-					const validationResponse = await this.helpers.httpRequest({
+					const validationOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+						baseURL: BASE_URLS.VALIDATION,
+						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
 						headers: {
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const validationResponse = await this.helpers.httpRequest(validationOptions);
 
 					if (!validationResponse.success || validationResponse.product !== 'notifyer') {
 						// Default option if not using notifyer or validation failed
@@ -718,14 +733,17 @@ export class WhatsAble implements INodeType {
 					}
 
 					// Fetch available templates from API using the user ID
-					const response = await this.helpers.httpRequest({
+					const templatesOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:ErOQ8pSj/n8n_templates?user_id=${userId}`,
+						baseURL: BASE_URLS.NOTIFYER,
+						url: `/n8n_templates?user_id=${userId}`,
 						headers: {
 							'Authorization': `Bearer ${apiKey}`,
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const response = await this.helpers.httpRequest(templatesOptions);
 
 					// Process templates from response
 					if (Array.isArray(response)) {
@@ -771,13 +789,16 @@ export class WhatsAble implements INodeType {
 					const apiKey = credentials.apiKey as string;
 
 					// First get user ID from validation API
-					const validationResponse = await this.helpers.httpRequest({
+					const validationOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_whatsable?apiKey=${encodeURIComponent(apiKey)}`,
+						baseURL: BASE_URLS.VALIDATION,
+						url: `/check_api_key_whatsable?apiKey=${encodeURIComponent(apiKey)}`,
 						headers: {
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const validationResponse = await this.helpers.httpRequest(validationOptions);
 
 					if (!validationResponse.success || !validationResponse.apiData?.user_id) {
 						returnData.push({
@@ -789,13 +810,16 @@ export class WhatsAble implements INodeType {
 					}
 
 					// Get WhatsApp numbers using the user ID
-					const response = await this.helpers.httpRequest({
+					const numbersOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:gncnl2D6/get_whatsable-numbers?userId=${validationResponse.apiData.user_id}`,
+						baseURL: BASE_URLS.VALIDATION,
+						url: `/get_whatsable-numbers?userId=${validationResponse.apiData.user_id}`,
 						headers: {
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const response = await this.helpers.httpRequest(numbersOptions);
 
 					// Process numbers from response
 					if (Array.isArray(response)) {
@@ -835,13 +859,16 @@ export class WhatsAble implements INodeType {
 					const apiKey = credentials.apiKey as string;
 
 					// First get user ID from validation API
-					const validationResponse = await this.helpers.httpRequest({
+					const validationOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+						baseURL: BASE_URLS.VALIDATION,
+						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
 						headers: {
 							'Accept': 'application/json',
 						},
-					});
+					};
+
+					const validationResponse = await this.helpers.httpRequest(validationOptions);
 
 					if (!validationResponse.success || !validationResponse.apiData?.user_id) {
 						returnData.push({
@@ -853,14 +880,17 @@ export class WhatsAble implements INodeType {
 					}
 
 					// Get labels using the user ID
-					const response = await this.helpers.httpRequest({
+					const labelsOptions: IHttpRequestOptions = {
 						method: 'GET',
-						url: `https://api.insightssystem.com/api:ErOQ8pSj/n8n/label?user_id=${validationResponse.apiData.user_id}`,
+						baseURL: BASE_URLS.NOTIFYER,
+						url: `/n8n/label?user_id=${validationResponse.apiData.user_id}`,
 						headers: {
 							'Accept': 'application/json',
 							'Authorization': `Bearer ${apiKey}`,
 						},
-					});
+					};
+
+					const response = await this.helpers.httpRequest(labelsOptions);
 
 					// Process labels from response
 					if (Array.isArray(response)) {
@@ -900,10 +930,6 @@ export class WhatsAble implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 
-		// Get credentials
-		const credentials = await this.getCredentials('whatsAbleApi');
-		const apiKey = credentials.apiKey as string;
-
 		// First validate the API key and get the product type
 		let productType: string;
 		let userId: string = '';
@@ -911,13 +937,23 @@ export class WhatsAble implements INodeType {
 		let validationMessage: string;
 
 		try {
-			const validationResponse = await this.helpers.httpRequest({
+			const validationOptions: IHttpRequestOptions = {
 				method: 'GET',
-				url: `https://api.insightssystem.com/api:gncnl2D6/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+				baseURL: BASE_URLS.VALIDATION,
+				url: `/check_api_key_across_projects`,
+				qs: {
+					apiKey: '={{$credentials.apiKey}}',
+				},
 				headers: {
 					'Accept': 'application/json',
 				},
-			});
+			};
+
+			const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
+				this,
+				'whatsAbleApi',
+				validationOptions,
+			);
 
 			validationSuccessful = validationResponse.success;
 			validationMessage = validationResponse.message;
@@ -951,13 +987,13 @@ export class WhatsAble implements INodeType {
 					const attachment = this.getNodeParameter('attachment', i, '') as string;
 					const filename = this.getNodeParameter('filename', i, '') as string;
 
-					response = await this.helpers.httpRequest({
+					const options: IHttpRequestOptions = {
 						method: 'POST',
-						url: 'https://api.insightssystem.com/api:gncnl2D6/n8n_send_message',
+						baseURL: BASE_URLS.NOTIFIER,
+						url: '/n8n_send_message',
 						headers: {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json',
-							'Authorization': `Bearer ${apiKey}`,
 						},
 						body: {
 							phone: recipient,
@@ -965,7 +1001,13 @@ export class WhatsAble implements INodeType {
 							attachment: attachment,
 							filename: filename,
 						},
-					});
+					};
+
+					response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						options,
+					);
 				} else if (productType === 'notifyer' && operation === 'sendNotifyerTemplate') {
 					// For notifyer product - template sending
 					const recipient = this.getNodeParameter('notifyerRecipient', i) as string;
@@ -1005,16 +1047,22 @@ export class WhatsAble implements INodeType {
 							labels: labels,
 						};
 
-						response = await this.helpers.httpRequest({
+						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule',
+							baseURL: BASE_URLS.NOTIFYER,
+							url: '/n8n/schedule',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
 							},
 							body: scheduleRequestBody,
-						});
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
 					} else {
 						// For immediate template sending, use the original API
 						const requestBody = {
@@ -1026,16 +1074,22 @@ export class WhatsAble implements INodeType {
 							labels: labels,
 						};
 
-						response = await this.helpers.httpRequest({
+						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule',
+							baseURL: BASE_URLS.NOTIFYER,
+							url: '/n8n/schedule',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
-								'Authorization': `Bearer ${apiKey}`,
 							},
 							body: requestBody,
-						});
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
 					}
 				} else if (productType === 'notifyer' && operation === 'sendNonTemplateMessage') {
 					// For notifyer product - non-template message sending
@@ -1076,17 +1130,23 @@ export class WhatsAble implements INodeType {
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/schedule/non-template',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: scheduleRequestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						} else {
 							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
@@ -1096,23 +1156,29 @@ export class WhatsAble implements INodeType {
 									preview_url: enableLinkPreview
 								},
 								type: "text",
-								api_key: apiKey,
+								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/send/nonTemplate',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: requestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						}
 					} else if (messageType === 'document') {
 						const documentUrl = this.getNodeParameter('documentUrl', i) as string;
@@ -1137,17 +1203,23 @@ export class WhatsAble implements INodeType {
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/schedule/non-template',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: scheduleRequestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						} else {
 							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
@@ -1158,28 +1230,30 @@ export class WhatsAble implements INodeType {
 									caption: documentCaption,
 									filename: documentFilename
 								},
-								api_key: apiKey,
+								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
 							};
 							
-							// Format document message in the specified format
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/send/nonTemplate',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: requestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						}
-						
-						// Log the full response for debugging
-						console.log('Document message API response:', JSON.stringify(response));
 						
 						// Check if the response contains a message indicating an error
 						if (response && response.body && response.body.message) {
@@ -1208,17 +1282,23 @@ export class WhatsAble implements INodeType {
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/schedule/non-template',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: scheduleRequestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						} else {
 							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
@@ -1228,28 +1308,30 @@ export class WhatsAble implements INodeType {
 									link: imageUrl,
 									caption: imageCaption
 								},
-								api_key: apiKey,
+								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
 							};
 							
-							// Format image message in the specified format
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/send/nonTemplate',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: requestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						}
-						
-						// Log the full response for debugging
-						console.log('Image message API response:', JSON.stringify(response));
 						
 						// Check if the response contains a message indicating an error
 						if (response && response.body && response.body.message) {
@@ -1278,17 +1360,23 @@ export class WhatsAble implements INodeType {
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/schedule/non-template',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: scheduleRequestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						} else {
 							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
@@ -1298,28 +1386,30 @@ export class WhatsAble implements INodeType {
 									link: videoUrl,
 									caption: videoCaption
 								},
-								api_key: apiKey,
+								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
 							};
 							
-							// Format video message in the specified format
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/send/nonTemplate',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: requestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						}
-						
-						// Log the full response for debugging
-						console.log('Video message API response:', JSON.stringify(response));
 						
 						// Check if the response contains a message indicating an error
 						if (response && response.body && response.body.message) {
@@ -1346,17 +1436,23 @@ export class WhatsAble implements INodeType {
 								labels: labels,
 							};
 							
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/schedule/non-template',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/schedule/non-template',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: scheduleRequestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						} else {
 							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
@@ -1365,28 +1461,30 @@ export class WhatsAble implements INodeType {
 								audio: {
 									link: audioUrl
 								},
-								api_key: apiKey,
+								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
 							};
 							
-							// Format audio message in the specified format
-							response = await this.helpers.httpRequest({
+							const options: IHttpRequestOptions = {
 								method: 'POST',
-								url: 'https://api.insightssystem.com/api:ErOQ8pSj/n8n/send/nonTemplate',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/send/nonTemplate',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
-									'Authorization': `Bearer ${apiKey}`,
 								},
 								body: requestBody,
 								returnFullResponse: true,
-							});
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
 						}
-						
-						// Log the full response for debugging
-						console.log('Audio message API response:', JSON.stringify(response));
 						
 						// Check if the response contains a message indicating an error
 						if (response && response.body && response.body.message) {
@@ -1402,22 +1500,28 @@ export class WhatsAble implements INodeType {
 					const attachment = this.getNodeParameter('whatsableAttachment', i, '') as string;
 					const filename = this.getNodeParameter('whatsableFilename', i, '') as string;
 
-					response = await this.helpers.httpRequest({
+					const options: IHttpRequestOptions = {
 						method: 'POST',
-						url: 'https://api.insightssystem.com/api:YyPzWfoq/whatsable_send_message',
+						baseURL: BASE_URLS.WHATSABLE,
+						url: '/whatsable_send_message',
 						headers: {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json',
-							'Authorization': apiKey, // Different auth format for Whatsable
 						},
 						body: {
 							to: to,
 							text: text,
 							attachment: attachment,
 							filename: filename,
-							apiKey: apiKey,
+							apiKey: '={{$credentials.apiKey}}',
 						},
-					});
+					};
+
+					response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						options,
+					);
 				} else {
 					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not supported for product type ${productType}`);
 				}

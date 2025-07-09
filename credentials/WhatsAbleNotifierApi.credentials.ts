@@ -45,4 +45,4 @@ export class WhatsAbleNotifierApi implements ICredentialType {
             }
         }
     };
-} 
+}
