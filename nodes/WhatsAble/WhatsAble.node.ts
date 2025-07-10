@@ -1139,7 +1139,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/schedule/non-template',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1170,7 +1170,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/send/nonTemplate',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1211,7 +1211,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/schedule/non-template',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1243,7 +1243,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/send/nonTemplate',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1260,11 +1260,11 @@ export class WhatsAble implements INodeType {
 						}
 						
 						// Check if the response contains a message indicating an error
-						if (response && response.body && response.body.message) {
-							throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						} else if (response && response.message) {
-							throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						}
+						// if (response && response.body && response.body.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
+						// } else if (response && response.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
+						// }
 					} else if (messageType === 'image') {
 						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
 						const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
@@ -1289,7 +1289,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/schedule/non-template',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1320,7 +1320,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/send/nonTemplate',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1337,11 +1337,11 @@ export class WhatsAble implements INodeType {
 						}
 						
 						// Check if the response contains a message indicating an error
-						if (response && response.body && response.body.message) {
-							throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						} else if (response && response.message) {
-							throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						}
+						// if (response && response.body && response.body.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
+						// } else if (response && response.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
+						// }
 					} else if (messageType === 'video') {
 						const videoUrl = this.getNodeParameter('videoUrl', i) as string;
 						const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
@@ -1366,7 +1366,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/schedule/non-template',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1397,7 +1397,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/send/nonTemplate',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1414,11 +1414,11 @@ export class WhatsAble implements INodeType {
 						}
 						
 						// Check if the response contains a message indicating an error
-						if (response && response.body && response.body.message) {
-							throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						} else if (response && response.message) {
-							throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						}
+						// if (response && response.body && response.body.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
+						// } else if (response && response.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
+						// }
 					} else if (messageType === 'audio') {
 						const audioUrl = this.getNodeParameter('audioUrl', i) as string;
 						
@@ -1441,7 +1441,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/schedule/non-template',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1471,7 +1471,7 @@ export class WhatsAble implements INodeType {
 							const options: IHttpRequestOptions = {
 								method: 'POST',
 								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/send/nonTemplate',
+								url: '/n8n/general/send-message',
 								headers: {
 									'Content-Type': 'application/json',
 									'Accept': 'application/json',
@@ -1488,11 +1488,11 @@ export class WhatsAble implements INodeType {
 						}
 						
 						// Check if the response contains a message indicating an error
-						if (response && response.body && response.body.message) {
-							throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						} else if (response && response.message) {
-							throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						}
+						// if (response && response.body && response.body.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
+						// } else if (response && response.message) {
+						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
+						// }
 					}
 				} else if (productType === 'whatsable' && operation === 'sendWhatsableMessage') {
 					// For whatsable product
