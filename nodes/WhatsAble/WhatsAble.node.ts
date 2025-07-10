@@ -941,7 +941,7 @@ export class WhatsAble implements INodeType {
 
 		// First validate the API key and get the product type
 		let productType: string;
-		let userId: string = '';
+		// let userId: string = '';
 		let validationSuccessful: boolean;
 		let validationMessage: string;
 
@@ -971,9 +971,9 @@ export class WhatsAble implements INodeType {
 			productType = validationResponse.product;
 
 			// Store user_id if product is notifyer
-			if (productType === 'notifyer' && validationResponse.apiData && validationResponse.apiData.user_id) {
-				userId = validationResponse.apiData.user_id;
-			}
+			// if (productType === 'notifyer' && validationResponse.apiData && validationResponse.apiData.user_id) {
+			// 	userId = validationResponse.apiData.user_id;
+			// }
 		} catch (error) {
 			throw new NodeOperationError(this.getNode(), `API key validation failed: ${error.message}`);
 		}
@@ -1056,7 +1056,7 @@ export class WhatsAble implements INodeType {
 						const options: IHttpRequestOptions = {
 							method: 'POST',
 							baseURL: BASE_URLS.NOTIFYER,
-							url: '/n8n/schedule',
+							url: '/n8n/send-message',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
@@ -1072,7 +1072,7 @@ export class WhatsAble implements INodeType {
 					} else {
 						// For immediate template sending, use the original API
 						const requestBody = {
-							user_id: userId || "efa5aa36-9b42-445c-a6f6-11a26fda86e9",
+							// user_id: userId,
 							template: templateData.template_id,
 							variables: variables,
 							phone_number: recipient,
@@ -1083,7 +1083,7 @@ export class WhatsAble implements INodeType {
 						const options: IHttpRequestOptions = {
 							method: 'POST',
 							baseURL: BASE_URLS.NOTIFYER,
-							url: '/n8n/schedule',
+							url: '/n8n/send-message',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
