@@ -34,11 +34,11 @@ describe('WhatsAbleApi Credentials', () => {
 		expect(auth.properties).toBeDefined();
 		
 		// Type assertion to ensure TypeScript knows the property exists
-		if (auth.properties && auth.properties.qs) {
-			expect(auth.properties.qs).toHaveProperty('apiKey');
-			expect(auth.properties.qs.apiKey).toBe('={{$credentials.apiKey}}');
+		if (auth.properties && auth.properties.headers) {
+			expect(auth.properties.headers).toHaveProperty('Authorization');
+			expect(auth.properties.headers.Authorization).toBe('={{$credentials.apiKey}}');
 		} else {
-			fail('Authentication properties or qs property is missing');
+			throw new Error('Authentication properties or headers property is missing');
 		}
 	});
 }); 

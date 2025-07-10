@@ -26,7 +26,7 @@ export class WhatsAble implements INodeType {
 		displayName: 'WhatsAble',
 		name: 'whatsAble',
 		icon: 'file:whatsable.svg',
-		group: [],
+		group: ['communication'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
 		description: 'Automate WhatsApp messages',
@@ -43,15 +43,56 @@ export class WhatsAble implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Operation Name or ID',
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Send Message',
+						value: 'sendMessage',
+					},
+				],
+				default: 'sendMessage',
+				required: true,
+			},
+			{
+				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
-				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				noDataExpression: true,
-				default: '',
-				typeOptions: {
-					loadOptionsMethod: 'getOperations',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+					},
 				},
+				options: [
+					{
+						name: 'Send Message Via Whatsable',
+						value: 'sendWhatsableMessage',
+						description: 'Send WhatsApp messages via WhatsAble platform',
+						action: 'Send message via whatsable',
+					},
+					{
+						name: 'Send Message Via Notifier',
+						value: 'sendMessage',
+						description: 'Send WhatsApp messages with optional attachments',
+						action: 'Send message via notifier',
+					},
+					{
+						name: 'Send Template Via Notifyer',
+						value: 'sendNotifyerTemplate',
+						description: 'Send template-based WhatsApp messages',
+						action: 'Send template via notifyer',
+					},
+					{
+						name: 'Send Non Template Via Notifyer',
+						value: 'sendNonTemplateMessage',
+						description: 'Send non-template WhatsApp messages',
+						action: 'Send non template via notifyer',
+					},
+				],
+				default: 'sendMessage',
 				required: true,
 			},
 
@@ -64,6 +105,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendMessage'],
 					},
 				},
@@ -78,6 +120,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendMessage'],
 					},
 				},
@@ -94,6 +137,7 @@ export class WhatsAble implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendMessage'],
 					},
 				},
@@ -106,6 +150,7 @@ export class WhatsAble implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendMessage'],
 					},
 				},
@@ -120,6 +165,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -136,6 +182,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -154,6 +201,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -180,6 +228,7 @@ export class WhatsAble implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -195,6 +244,7 @@ export class WhatsAble implements INodeType {
 				default: [],
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -210,6 +260,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -222,6 +273,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 						scheduleTemplateMessage: [true],
 					},
@@ -235,6 +287,7 @@ export class WhatsAble implements INodeType {
 				type: 'options',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNotifyerTemplate'],
 						scheduleTemplateMessage: [true],
 					},
@@ -256,6 +309,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendWhatsableMessage'],
 					},
 				},
@@ -269,6 +323,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendWhatsableMessage'],
 					},
 				},
@@ -284,6 +339,7 @@ export class WhatsAble implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendWhatsableMessage'],
 					},
 				},
@@ -296,6 +352,7 @@ export class WhatsAble implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendWhatsableMessage'],
 					},
 				},
@@ -311,6 +368,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -324,6 +382,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -359,6 +418,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['text'],
 					},
@@ -372,6 +432,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -385,6 +446,7 @@ export class WhatsAble implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -399,6 +461,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -413,6 +476,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -426,6 +490,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -439,6 +504,7 @@ export class WhatsAble implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -453,6 +519,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -466,6 +533,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -479,6 +547,7 @@ export class WhatsAble implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -493,6 +562,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -506,6 +576,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['audio'],
 					},
@@ -520,6 +591,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['audio'],
 					},
@@ -533,6 +605,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						messageType: ['text'],
 					},
@@ -547,6 +620,7 @@ export class WhatsAble implements INodeType {
 				default: [],
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -562,6 +636,7 @@ export class WhatsAble implements INodeType {
 				default: false,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -574,6 +649,7 @@ export class WhatsAble implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						scheduleNonTemplateMessage: [true],
 					},
@@ -587,6 +663,7 @@ export class WhatsAble implements INodeType {
 				type: 'options',
 				displayOptions: {
 					show: {
+						resource: ['sendMessage'],
 						operation: ['sendNonTemplateMessage'],
 						scheduleNonTemplateMessage: [true],
 					},
@@ -614,123 +691,11 @@ export class WhatsAble implements INodeType {
 
 	methods = {
 		loadOptions: {
-			async getOperations(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const returnData: INodePropertyOptions[] = [];
-
-				try {
-					const options: IHttpRequestOptions = {
-						method: 'GET',
-						baseURL: BASE_URLS.VALIDATION,
-						url: '/check-api-key-across-projects',
-						headers: {
-							'Accept': 'application/json',
-						},
-					};
-
-					const response = await this.helpers.httpRequestWithAuthentication.call(
-						this,
-						'whatsAbleApi',
-						options,
-					);
-
-					if (!response.success) {
-						// If validation failed, show the error message
-						returnData.push({
-							name: `Error: ${response.message}`,
-							value: 'error',
-							description: 'API key validation failed',
-						});
-						return returnData;
-					}
-
-					// Store the product type in options
-					const productType = response.product;
-
-					// Return different operations based on the product type
-					if (productType === 'notifier') {
-						returnData.push({
-							name: 'Send Message (Notifier)',
-							value: 'sendMessage',
-							description: '✅ Product: Notifier - Send WhatsApp messages with optional attachments',
-						});
-					} else if (productType === 'notifyer') {
-						returnData.push({
-							name: 'Send Template (Notifyer)',
-							value: 'sendNotifyerTemplate',
-							description: '✅ Product: Notifyer - Send template-based WhatsApp messages',
-						});
-						returnData.push({
-							name: 'Send Non Template Message',
-							value: 'sendNonTemplateMessage',
-							description: '✅ Product: Notifyer - Send non-template WhatsApp messages',
-						});
-					} else if (productType === 'whatsable') {
-						returnData.push({
-							name: 'Send Message (WhatsAble)',
-							value: 'sendWhatsableMessage',
-							description: '✅ Product: WhatsAble - Send WhatsApp messages via WhatsAble platform',
-						});
-					} else {
-						// Default for unknown product
-						returnData.push({
-							name: `Send Message (${productType})`,
-							value: 'sendMessage',
-							description: `✅ Product: ${productType} - Default operations available`,
-						});
-					}
-				} catch (error) {
-					// If API call fails, return error option
-					returnData.push({
-						name: `Error: ${error.message}`,
-						value: 'error',
-						description: '⚠️ Error: Could not validate API key. Make sure your credentials are correct.',
-					});
-				}
-
-				return returnData;
-			},
 
 			async getTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// First get user ID from validation API
-					// const validationOptions: IHttpRequestOptions = {
-					// 	method: 'GET',
-					// 	baseURL: BASE_URLS.VALIDATION,
-					// 	url: '/check_api_key_across_projects',
-					// 	headers: {
-					// 		'Accept': 'application/json',
-					// 	},
-					// };
-
-					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
-					// 	this,
-					// 	'whatsAbleApi',
-					// 	validationOptions,
-					// );
-
-					// if (!validationResponse.success || validationResponse.product !== 'notifyer') {
-					// 	// Default option if not using notifyer or validation failed
-					// 	returnData.push({
-					// 		name: 'Default Template',
-					// 		value: '474a6b8f-c722-4327-b8b2-461a20f0cc3c',
-					// 	});
-					// 	return returnData;
-					// }
-
-					// Get the user ID from the API response
-					// const userId = validationResponse.apiData && validationResponse.apiData.user_id;
-
-					// if (!userId) {
-					// 	returnData.push({
-					// 		name: 'Error: User ID not found',
-					// 		value: 'error',
-					// 		description: 'Could not find user ID in API response',
-					// 	});
-					// 	return returnData;
-					// }
-
 					// Fetch available templates from API using the user ID
 					const templatesOptions: IHttpRequestOptions = {
 						method: 'GET',
@@ -786,32 +751,7 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// First get user ID from validation API
-					// const validationOptions: IHttpRequestOptions = {
-					// 	method: 'GET',
-					// 	baseURL: BASE_URLS.VALIDATION,
-					// 	url: `/check_api_key_whatsable`,
-					// 	headers: {
-					// 		'Accept': 'application/json',
-					// 	},
-					// };
-
-					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
-					// 	this,
-					// 	'whatsAbleApi',
-					// 	validationOptions,
-					// );
-
-					// if (!validationResponse.success || !validationResponse.apiData?.user_id) {
-					// 	returnData.push({
-					// 		name: 'Error: Could not get user ID',
-					// 		value: 'error',
-					// 		description: 'Failed to get user ID from API',
-					// 	});
-					// 	return returnData;
-					// }
-
-					// Get WhatsApp numbers using the user ID
+					// Get WhatsApp numbers
 					const numbersOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.VALIDATION,
@@ -860,32 +800,7 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// First get user ID from validation API
-					// const validationOptions: IHttpRequestOptions = {
-					// 	method: 'GET',
-					// 	baseURL: BASE_URLS.VALIDATION,
-					// 	url: `/check_api_key_across_projects`,
-					// 	headers: {
-					// 		'Accept': 'application/json',
-					// 	},
-					// };
-
-					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
-					// 	this,
-					// 	'whatsAbleApi',
-					// 	validationOptions,
-					// );
-
-					// if (!validationResponse.success || !validationResponse.apiData?.user_id) {
-					// 	returnData.push({
-					// 		name: 'Error: Could not get user ID',
-					// 		value: 'error',
-					// 		description: 'Failed to get user ID from API',
-					// 	});
-					// 	return returnData;
-					// }
-
-					// Get labels using the user ID
+					// Get labels
 					const labelsOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.NOTIFYER,
@@ -939,9 +854,6 @@ export class WhatsAble implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 
-		// First validate the API key and get the product type
-		let productType: string;
-		// let userId: string = '';
 		let validationSuccessful: boolean;
 		let validationMessage: string;
 
@@ -968,12 +880,6 @@ export class WhatsAble implements INodeType {
 				throw new NodeApiError(this.getNode(), { message: `API key validation failed: ${validationMessage}` });
 			}
 
-			productType = validationResponse.product;
-
-			// Store user_id if product is notifyer
-			// if (productType === 'notifyer' && validationResponse.apiData && validationResponse.apiData.user_id) {
-			// 	userId = validationResponse.apiData.user_id;
-			// }
 		} catch (error) {
 			throw new NodeOperationError(this.getNode(), `API key validation failed: ${error.message}`);
 		}
@@ -984,9 +890,7 @@ export class WhatsAble implements INodeType {
 				const operation = this.getNodeParameter('operation', i) as string;
 
 				let response;
-
-				// Handle operations based on product type
-				if (productType === 'notifier' && operation === 'sendMessage') {
+				if (operation === 'sendMessage') {
 					// For notifier product
 					const recipient = this.getNodeParameter('recipient', i) as string;
 					const message = this.getNodeParameter('message', i) as string;
@@ -1014,7 +918,7 @@ export class WhatsAble implements INodeType {
 						'whatsAbleApi',
 						options,
 					);
-				} else if (productType === 'notifyer' && operation === 'sendNotifyerTemplate') {
+				} else if (operation === 'sendNotifyerTemplate') {
 					// For notifyer product - template sending
 					const recipient = this.getNodeParameter('notifyerRecipient', i) as string;
 					const templateId = this.getNodeParameter('notifyerTemplate', i) as string;
@@ -1090,7 +994,6 @@ export class WhatsAble implements INodeType {
 							options,
 						);
 					} else {
-						// For immediate template sending, use the original API
 						const requestBody = {
 							// user_id: userId,
 							template: templateData.template_id,
@@ -1117,7 +1020,7 @@ export class WhatsAble implements INodeType {
 							options,
 						);
 					}
-				} else if (productType === 'notifyer' && operation === 'sendNonTemplateMessage') {
+				} else if (operation === 'sendNonTemplateMessage') {
 					// For notifyer product - non-template message sending
 					const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
 					const messageType = this.getNodeParameter('messageType', i) as string;
@@ -1140,7 +1043,6 @@ export class WhatsAble implements INodeType {
 						const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
 						
 						if (scheduleMessage) {
-							// For scheduled non-template messages, use the schedule/non-template API
 							const scheduleRequestBody = {
 								to: recipient,
 								text: {
@@ -1174,7 +1076,6 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						} else {
-							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
 								to: recipient,
 								text: {
@@ -1211,7 +1112,6 @@ export class WhatsAble implements INodeType {
 						const documentFilename = this.getNodeParameter('documentFilename', i) as string;
 						
 						if (scheduleMessage) {
-							// For scheduled document messages, use the schedule/non-template API
 							const scheduleRequestBody = {
 								to: recipient,
 								document: {
@@ -1246,7 +1146,6 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						} else {
-							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
 								to: recipient,
 								type: "document",
@@ -1278,19 +1177,11 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						}
-						
-						// Check if the response contains a message indicating an error
-						// if (response && response.body && response.body.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						// } else if (response && response.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						// }
 					} else if (messageType === 'image') {
 						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
 						const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
 						
 						if (scheduleMessage) {
-							// For scheduled image messages, use the schedule/non-template API
 							const scheduleRequestBody = {
 								to: recipient,
 								image: {
@@ -1324,7 +1215,6 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						} else {
-							// For immediate sending, use the original API
 							const requestBody: Record<string, any> = {
 								to: recipient,
 								type: "image",
@@ -1356,18 +1246,11 @@ export class WhatsAble implements INodeType {
 							);
 						}
 						
-						// Check if the response contains a message indicating an error
-						// if (response && response.body && response.body.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						// } else if (response && response.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						// }
 					} else if (messageType === 'video') {
 						const videoUrl = this.getNodeParameter('videoUrl', i) as string;
 						const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
 						
 						if (scheduleMessage) {
-							// For scheduled video messages, use the schedule/non-template API
 							const scheduleRequestBody = {
 								to: recipient,
 								video: {
@@ -1401,7 +1284,7 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						} else {
-							// For immediate sending, use the original API
+							
 							const requestBody: Record<string, any> = {
 								to: recipient,
 								type: "video",
@@ -1433,17 +1316,12 @@ export class WhatsAble implements INodeType {
 							);
 						}
 						
-						// Check if the response contains a message indicating an error
-						// if (response && response.body && response.body.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						// } else if (response && response.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						// }
+						
 					} else if (messageType === 'audio') {
 						const audioUrl = this.getNodeParameter('audioUrl', i) as string;
 						
 						if (scheduleMessage) {
-							// For scheduled audio messages, use the schedule/non-template API
+							
 							const scheduleRequestBody = {
 								to: recipient,
 								audio: {
@@ -1476,7 +1354,7 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						} else {
-							// For immediate sending, use the original API
+							
 							const requestBody: Record<string, any> = {
 								to: recipient,
 								type: "audio",
@@ -1507,14 +1385,9 @@ export class WhatsAble implements INodeType {
 							);
 						}
 						
-						// Check if the response contains a message indicating an error
-						// if (response && response.body && response.body.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.body.message }, { itemIndex: i });
-						// } else if (response && response.message) {
-						// 	throw new NodeApiError(this.getNode(), { message: response.message }, { itemIndex: i });
-						// }
+						
 					}
-				} else if (productType === 'whatsable' && operation === 'sendWhatsableMessage') {
+				} else if (operation === 'sendWhatsableMessage') {
 					// For whatsable product
 					const to = this.getNodeParameter('whatsableTo', i) as string;
 					const text = this.getNodeParameter('whatsableText', i) as string;
@@ -1543,7 +1416,7 @@ export class WhatsAble implements INodeType {
 						options,
 					);
 				} else {
-					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not supported for product type ${productType}`);
+					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not supported`);
 				}
 
 				returnData.push({
@@ -1613,7 +1486,7 @@ export async function getTemplateVariables(this: ILoadOptionsFunctions): Promise
 			});
 		}
 		
-		// Handle URL buttons separately (if needed)
+		// Handle URL buttons separately 
 		templateData.components.components.forEach((component: any) => {
 			if (component.type === 'BUTTONS') {
 				const urlButton = component.buttons && component.buttons.find((button: any) => button.type === 'URL');
@@ -1635,7 +1508,7 @@ export async function getTemplateVariables(this: ILoadOptionsFunctions): Promise
 			}
 		});
 		
-		// Handle media headers separately (if needed)
+		// Handle media headers separately
 		templateData.components.components.forEach((component: any) => {
 			if (component.type === 'HEADER' && component.format !== 'TEXT') {
 				returnData.fields.push({

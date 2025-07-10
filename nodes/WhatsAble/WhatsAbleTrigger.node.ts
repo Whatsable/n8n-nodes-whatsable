@@ -3,25 +3,17 @@ import {
     INodeTypeDescription,
     IWebhookFunctions,
     IWebhookResponseData,
-    IHttpRequestOptions,
 } from 'n8n-workflow';
-
-// Base URLs for different endpoints
-const BASE_URLS = {
-	NOTIFIER: 'https://api.insightssystem.com/api:gncnl2D6',
-	NOTIFYER: 'https://api.insightssystem.com/api:dBShrB6H',
-	TRIGGER: 'https://api.insightssystem.com/api:KXAU3bZ4',
-} as const;
 
 export class WhatsAbleTrigger implements INodeType {
     description: INodeTypeDescription = {
-        displayName: 'WhatsAble Trigger',
+        displayName: 'Incoming message Trigger',
         name: 'whatsAbleTrigger',
         icon: 'file:whatsable.svg',
         group: ['trigger'],
         version: 1,
-        subtitle: '={{$parameter["event"]}}',
-        description: 'Combined WhatsAble Triggers',
+        subtitle: 'Incoming Message',
+        description: 'Triggers when receiving messages from WhatsAble services',
         defaults: {
             name: 'WhatsAble Trigger',
         },
@@ -30,28 +22,28 @@ export class WhatsAbleTrigger implements INodeType {
         credentials: [
             {
                 name: 'whatsAbleTriggerApi',
-                required: false,
+                required: true,
                 displayOptions: {
                     show: {
-                        event: ['whatsableTrigger'],
+                        credentialType: ['whatsableTrigger'],
                     },
                 },
             },
             {
                 name: 'whatsAbleNotifierApi',
-                required: false,
+                required: true,
                 displayOptions: {
                     show: {
-                        event: ['notifier'],
+                        credentialType: ['notifier'],
                     },
                 },
             },
             {
                 name: 'whatsAbleNotifyerApi',
-                required: false,
+                required: true,
                 displayOptions: {
                     show: {
-                        event: ['notifyer'],
+                        credentialType: ['notifyer'],
                     },
                 },
             },
@@ -67,28 +59,28 @@ export class WhatsAbleTrigger implements INodeType {
         ],
         properties: [
             {
-                displayName: 'Event',
-                name: 'event',
+                displayName: 'Credential Type',
+                name: 'credentialType',
                 type: 'options',
                 options: [
                     {
-                        name: 'Whatsable Incoming Message From Recipient',
+                        name: 'WhatsAble Trigger API',
                         value: 'whatsableTrigger',
-                        description: 'Incoming Message From Whatsable',
+                        description: 'Use WhatsAble Trigger API for incoming messages',
                     },
                     {
-                        name: 'Notifier Incoming Message From Recipient',
+                        name: 'WhatsAble Notifier API',
                         value: 'notifier',
-                        description: 'Incoming Message From WhatsAble Notifier',
+                        description: 'Use WhatsAble Notifier API for incoming messages',
                     },
                     {
-                        name: 'Notifyer System Incoming Message From Recipient',
+                        name: 'WhatsAble Notifyer System API',
                         value: 'notifyer',
-                        description: 'Incoming Message From recipient',
+                        description: 'Use WhatsAble Notifyer System API for incoming messages',
                     }
                 ],
                 default: 'whatsableTrigger',
-                description: 'Choose which event to trigger on',
+                description: 'Choose which WhatsAble API to use for this trigger',
             },
             {
                 displayName: 'HTTP Method',
@@ -126,71 +118,7 @@ export class WhatsAbleTrigger implements INodeType {
     };
 
     async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-        const event = this.getNodeParameter('event') as string;
         const webhookData = this.getRequestObject().body;
-
-        if (event === 'notifier') {
-            const credentials = await this.getCredentials('whatsAbleNotifierApi');
-            try {
-                const options: IHttpRequestOptions = {
-                    method: 'POST',
-                    baseURL: BASE_URLS.NOTIFIER,
-                    url: '/n8n/notifier/webhook',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': credentials.apiKey as string,
-                    },
-                    body: {
-                        url: credentials.productionWebhookUrl,
-                    },
-                };
-
-                await this.helpers.httpRequestWithAuthentication.call(this, 'whatsAbleNotifierApi', options);
-            } catch (error) {
-                console.error('Failed to register notifier webhook URL:', error);
-            }
-        } else if (event === 'notifyer') {
-            const credentials = await this.getCredentials('whatsAbleNotifyerApi');
-            try {
-                const options: IHttpRequestOptions = {
-                    method: 'POST',
-                    baseURL: BASE_URLS.NOTIFYER,
-                    url: '/n8n',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': credentials.apiKey as string,
-                    },
-                    body: {
-                        hookUrl: credentials.productionWebhookUrl,
-                        api_key: credentials.apiKey as string,
-                    },
-                };
-
-                await this.helpers.httpRequestWithAuthentication.call(this, 'whatsAbleNotifyerApi', options);
-            } catch (error) {
-                console.error('Failed to register notifyer webhook URL:', error);
-            }
-        } else if (event === 'whatsableTrigger') {
-            const credentials = await this.getCredentials('whatsAbleTriggerApi');
-            try {
-                const options: IHttpRequestOptions = {
-                    method: 'POST',
-                    baseURL: BASE_URLS.TRIGGER,
-                    url: '/n8n/webhook',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': credentials.apiKey as string,
-                    },
-                    body: {
-                        url: credentials.productionWebhookUrl,
-                    },
-                };
-
-                await this.helpers.httpRequestWithAuthentication.call(this, 'whatsAbleTriggerApi', options);
-            } catch (error) {
-                console.error('Failed to register WhatsAble Trigger webhook URL:', error);
-            }
-        }
 
         return {
             workflowData: [this.helpers.returnJsonArray(webhookData)],
