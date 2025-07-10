@@ -1026,10 +1026,30 @@ export class WhatsAble implements INodeType {
 					// Get template data to validate variable counts
 					const templateData = JSON.parse(templateId);
 
-					// Convert ResourceMapper value to variables object with bodyN format
+					// Convert ResourceMapper value to variables object with correct format based on template structure
 					const variables: Record<string, string> = {};
-					Object.values(variablesObj.value).forEach((value, index) => {
-						variables[`body${index + 1}`] = value;
+					
+					// Parse the template structure to understand variable mapping
+					const templateComponents = templateData.components.components;
+					
+					// Check for media header
+					const hasMediaHeader = templateComponents.some((c: any) => c.type === 'HEADER' && c.format !== 'TEXT');
+					
+					// Check for URL button
+					const hasUrlButton = templateComponents.some((c: any) => 
+						c.type === 'BUTTONS' && c.buttons && c.buttons.some((b: any) => b.type === 'URL')
+					);
+					
+					// Map variables based on template structure
+					Object.entries(variablesObj.value).forEach(([key, value]) => {
+						if (key === 'media' && hasMediaHeader) {
+							variables['media'] = value;
+						} else if (key === 'visit_website' && hasUrlButton) {
+							variables['visit_website'] = value;
+						} else if (key.startsWith('body')) {
+							// For body variables, keep the bodyN format
+							variables[key] = value;
+						}
 					});
 
 					// Use different API endpoints and data structures based on whether scheduling is enabled
@@ -1563,71 +1583,73 @@ export async function getTemplateVariables(this: ILoadOptionsFunctions): Promise
 		// Parse the template value to get variable_counts
 		const templateData = JSON.parse(templateValue);
 
-		function parseTemplateFormat(format: any, components: any) {
-			const parts = format.slice(1, -1).split(',').map((p: any) => p.trim());
-
-			parts.forEach((part: any) => {
-				const [type, count] = part.split(':');
-				const count_num = parseInt(count);
-
-				if (type === 'b') {
-					for (let i = 1; i <= count_num; i++) {
-						returnData.fields.push({
-							id: `body${i}`,
-							displayName: `Body ${i}. Example: ${templateData.components.components[0].example.body_text[0][i - 1]}`,
-							defaultMatch: true,
-							canBeUsedToMatch: true,
-							required: true,
-							display: true,
-							type: 'string'
-						});
-					}
-				} else if (type === 'm') {
-					// Find header component to get format
-					const headerComponent = components.components.find((c: any) => c.type === "HEADER");
-					let mediaHelp = "Enter media URL for ";
-					if (headerComponent) {
-						mediaHelp += `${headerComponent.format.toLowerCase()} header\n`;
-						if (headerComponent.example && headerComponent.example.header_handle) {
-							mediaHelp += `Example format: https://drive.google.com/file/d/1yxqMkC7hGCxXDSl1LLztgzlfQUYo05PJ/view?usp=sharing`;
-						}
-					}
-
-					returnData.fields.push({
-						id: "media",
-						displayName: `Media. Example: ${mediaHelp}`,
-						defaultMatch: true,
-						canBeUsedToMatch: true,
-						required: true,
-						display: true,
-						type: 'string',
-					});
-				} else if (type === 'vw') {
-					// Find button with URL to check if dynamic
-					const urlButton = components.components
-						.find((c: any) => c.type === "BUTTONS")?.buttons
-						.find((b: any) => b.url);
-
-					let urlHelp = "Enter website URL";
-					if (urlButton && urlButton.url.includes("{{")) {
-						urlHelp += ` including parameter: ${urlButton.url}\nExample: Replace {{1}} with your page number`;
-					}
-
+		// Find the BODY component and count only its variables
+		const bodyComponent = templateData.components.components.find((c: any) => c.type === 'BODY');
+		let bodyVariableCount = 0;
+		
+		if (bodyComponent && bodyComponent.text) {
+			// Count variables in body text ({{1}}, {{2}}, etc.)
+			const variableMatches = bodyComponent.text.match(/\{\{\d+\}\}/g) || [];
+			bodyVariableCount = variableMatches.length;
+		}
+		
+		// Create body fields ONLY for body text variables
+		for (let i = 1; i <= bodyVariableCount; i++) {
+			let exampleText = `Variable ${i}`;
+			
+			// Try to get example from body component
+			if (bodyComponent && bodyComponent.example && bodyComponent.example.body_text && bodyComponent.example.body_text[0] && bodyComponent.example.body_text[0][i - 1]) {
+				exampleText = bodyComponent.example.body_text[0][i - 1];
+			}
+			
+			returnData.fields.push({
+				id: `body${i}`,
+				displayName: `Body ${i}. Example: ${exampleText}`,
+				defaultMatch: true,
+				canBeUsedToMatch: true,
+				required: true,
+				display: true,
+				type: 'string'
+			});
+		}
+		
+		// Handle URL buttons separately (if needed)
+		templateData.components.components.forEach((component: any) => {
+			if (component.type === 'BUTTONS') {
+				const urlButton = component.buttons && component.buttons.find((button: any) => button.type === 'URL');
+				
+				if (urlButton && urlButton.url && urlButton.url.includes('{{')) {
+					// Only add visit_website if URL has variables (dynamic URL)
+					let exampleUrl = urlButton.url.replace(/\{\{\d+\}\}/g, 'your-value');
+					
 					returnData.fields.push({
 						id: "visit_website",
-						displayName: `Visit Website. Example: ${urlHelp}`,
+						displayName: `Visit Website URL. Example: ${exampleUrl}`,
 						defaultMatch: true,
 						canBeUsedToMatch: true,
 						required: true,
 						display: true,
-						type: 'string',
+						type: 'string'
 					});
 				}
-			});
+			}
+		});
+		
+		// Handle media headers separately (if needed)
+		templateData.components.components.forEach((component: any) => {
+			if (component.type === 'HEADER' && component.format !== 'TEXT') {
+				returnData.fields.push({
+					id: "media",
+					displayName: `Media (${component.format}). Example: Enter media URL`,
+					defaultMatch: true,
+					canBeUsedToMatch: true,
+					required: true,
+					display: true,
+					type: 'string'
+				});
+			}
+		});
 
-		}
-
-		parseTemplateFormat(templateData.template_formate, templateData.components)
 	} catch (error) {
 		// If parsing fails, return empty fields
 		return returnData;
