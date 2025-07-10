@@ -18,7 +18,7 @@ const BASE_URLS = {
 	VALIDATION: 'https://api.insightssystem.com/api:gncnl2D6',
 	NOTIFIER: 'https://api.insightssystem.com/api:gncnl2D6',
 	NOTIFYER: 'https://api.insightssystem.com/api:ErOQ8pSj',
-	WHATSABLE: 'https://api.insightssystem.com/api:YyPzWfoq',
+	WHATSABLE: 'https://api.insightssystem.com/api:gncnl2D6',
 } as const;
 
 export class WhatsAble implements INodeType {
@@ -26,7 +26,7 @@ export class WhatsAble implements INodeType {
 		displayName: 'WhatsAble',
 		name: 'whatsAble',
 		icon: 'file:whatsable.svg',
-		group: ['action'],
+		group: [],
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
 		description: 'Automate WhatsApp messages',
@@ -43,7 +43,7 @@ export class WhatsAble implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Operation5 Name or ID',
+				displayName: 'Operation Name or ID',
 				name: 'operation',
 				type: 'options',
 				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
@@ -618,21 +618,20 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// Get credentials
-					const credentials = await this.getCredentials('whatsAbleApi');
-
-					// Make API call to validate credentials and get product info
-					const apiKey = credentials.apiKey as string;
 					const options: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.VALIDATION,
-						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
+						url: '/check-api-key-across-projects',
 						headers: {
 							'Accept': 'application/json',
 						},
 					};
 
-					const response = await this.helpers.httpRequest(options);
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						options,
+					);
 
 					if (!response.success) {
 						// If validation failed, show the error message
@@ -695,55 +694,58 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// Get credentials
-					const credentials = await this.getCredentials('whatsAbleApi');
-					const apiKey = credentials.apiKey as string;
-
 					// First get user ID from validation API
-					const validationOptions: IHttpRequestOptions = {
-						method: 'GET',
-						baseURL: BASE_URLS.VALIDATION,
-						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
-						headers: {
-							'Accept': 'application/json',
-						},
-					};
+					// const validationOptions: IHttpRequestOptions = {
+					// 	method: 'GET',
+					// 	baseURL: BASE_URLS.VALIDATION,
+					// 	url: '/check_api_key_across_projects',
+					// 	headers: {
+					// 		'Accept': 'application/json',
+					// 	},
+					// };
 
-					const validationResponse = await this.helpers.httpRequest(validationOptions);
+					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
+					// 	this,
+					// 	'whatsAbleApi',
+					// 	validationOptions,
+					// );
 
-					if (!validationResponse.success || validationResponse.product !== 'notifyer') {
-						// Default option if not using notifyer or validation failed
-						returnData.push({
-							name: 'Default Template',
-							value: '474a6b8f-c722-4327-b8b2-461a20f0cc3c',
-						});
-						return returnData;
-					}
+					// if (!validationResponse.success || validationResponse.product !== 'notifyer') {
+					// 	// Default option if not using notifyer or validation failed
+					// 	returnData.push({
+					// 		name: 'Default Template',
+					// 		value: '474a6b8f-c722-4327-b8b2-461a20f0cc3c',
+					// 	});
+					// 	return returnData;
+					// }
 
 					// Get the user ID from the API response
-					const userId = validationResponse.apiData && validationResponse.apiData.user_id;
+					// const userId = validationResponse.apiData && validationResponse.apiData.user_id;
 
-					if (!userId) {
-						returnData.push({
-							name: 'Error: User ID not found',
-							value: 'error',
-							description: 'Could not find user ID in API response',
-						});
-						return returnData;
-					}
+					// if (!userId) {
+					// 	returnData.push({
+					// 		name: 'Error: User ID not found',
+					// 		value: 'error',
+					// 		description: 'Could not find user ID in API response',
+					// 	});
+					// 	return returnData;
+					// }
 
 					// Fetch available templates from API using the user ID
 					const templatesOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.NOTIFYER,
-						url: `/n8n_templates?user_id=${userId}`,
+						url: `/n8n-templates`,
 						headers: {
-							'Authorization': `Bearer ${apiKey}`,
 							'Accept': 'application/json',
 						},
 					};
 
-					const response = await this.helpers.httpRequest(templatesOptions);
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						templatesOptions,
+					);
 
 					// Process templates from response
 					if (Array.isArray(response)) {
@@ -784,42 +786,46 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// Get credentials
-					const credentials = await this.getCredentials('whatsAbleApi');
-					const apiKey = credentials.apiKey as string;
-
 					// First get user ID from validation API
-					const validationOptions: IHttpRequestOptions = {
-						method: 'GET',
-						baseURL: BASE_URLS.VALIDATION,
-						url: `/check_api_key_whatsable?apiKey=${encodeURIComponent(apiKey)}`,
-						headers: {
-							'Accept': 'application/json',
-						},
-					};
+					// const validationOptions: IHttpRequestOptions = {
+					// 	method: 'GET',
+					// 	baseURL: BASE_URLS.VALIDATION,
+					// 	url: `/check_api_key_whatsable`,
+					// 	headers: {
+					// 		'Accept': 'application/json',
+					// 	},
+					// };
 
-					const validationResponse = await this.helpers.httpRequest(validationOptions);
+					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
+					// 	this,
+					// 	'whatsAbleApi',
+					// 	validationOptions,
+					// );
 
-					if (!validationResponse.success || !validationResponse.apiData?.user_id) {
-						returnData.push({
-							name: 'Error: Could not get user ID',
-							value: 'error',
-							description: 'Failed to get user ID from API',
-						});
-						return returnData;
-					}
+					// if (!validationResponse.success || !validationResponse.apiData?.user_id) {
+					// 	returnData.push({
+					// 		name: 'Error: Could not get user ID',
+					// 		value: 'error',
+					// 		description: 'Failed to get user ID from API',
+					// 	});
+					// 	return returnData;
+					// }
 
 					// Get WhatsApp numbers using the user ID
 					const numbersOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.VALIDATION,
-						url: `/get_whatsable-numbers?userId=${validationResponse.apiData.user_id}`,
+						url: `/get-whatsable-numbers`,
 						headers: {
 							'Accept': 'application/json',
 						},
 					};
 
-					const response = await this.helpers.httpRequest(numbersOptions);
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						numbersOptions,
+					);
 
 					// Process numbers from response
 					if (Array.isArray(response)) {
@@ -854,43 +860,46 @@ export class WhatsAble implements INodeType {
 				const returnData: INodePropertyOptions[] = [];
 
 				try {
-					// Get credentials
-					const credentials = await this.getCredentials('whatsAbleApi');
-					const apiKey = credentials.apiKey as string;
-
 					// First get user ID from validation API
-					const validationOptions: IHttpRequestOptions = {
-						method: 'GET',
-						baseURL: BASE_URLS.VALIDATION,
-						url: `/check_api_key_across_projects?apiKey=${encodeURIComponent(apiKey)}`,
-						headers: {
-							'Accept': 'application/json',
-						},
-					};
+					// const validationOptions: IHttpRequestOptions = {
+					// 	method: 'GET',
+					// 	baseURL: BASE_URLS.VALIDATION,
+					// 	url: `/check_api_key_across_projects`,
+					// 	headers: {
+					// 		'Accept': 'application/json',
+					// 	},
+					// };
 
-					const validationResponse = await this.helpers.httpRequest(validationOptions);
+					// const validationResponse = await this.helpers.httpRequestWithAuthentication.call(
+					// 	this,
+					// 	'whatsAbleApi',
+					// 	validationOptions,
+					// );
 
-					if (!validationResponse.success || !validationResponse.apiData?.user_id) {
-						returnData.push({
-							name: 'Error: Could not get user ID',
-							value: 'error',
-							description: 'Failed to get user ID from API',
-						});
-						return returnData;
-					}
+					// if (!validationResponse.success || !validationResponse.apiData?.user_id) {
+					// 	returnData.push({
+					// 		name: 'Error: Could not get user ID',
+					// 		value: 'error',
+					// 		description: 'Failed to get user ID from API',
+					// 	});
+					// 	return returnData;
+					// }
 
 					// Get labels using the user ID
 					const labelsOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.NOTIFYER,
-						url: `/n8n/label?user_id=${validationResponse.apiData.user_id}`,
+						url: `/n8n/label`,
 						headers: {
 							'Accept': 'application/json',
-							'Authorization': `Bearer ${apiKey}`,
 						},
 					};
 
-					const response = await this.helpers.httpRequest(labelsOptions);
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						labelsOptions,
+					);
 
 					// Process labels from response
 					if (Array.isArray(response)) {
@@ -940,10 +949,7 @@ export class WhatsAble implements INodeType {
 			const validationOptions: IHttpRequestOptions = {
 				method: 'GET',
 				baseURL: BASE_URLS.VALIDATION,
-				url: `/check_api_key_across_projects`,
-				qs: {
-					apiKey: '={{$credentials.apiKey}}',
-				},
+				url: `/check-api-key-across-projects`,
 				headers: {
 					'Accept': 'application/json',
 				},
@@ -990,7 +996,7 @@ export class WhatsAble implements INodeType {
 					const options: IHttpRequestOptions = {
 						method: 'POST',
 						baseURL: BASE_URLS.NOTIFIER,
-						url: '/n8n_send_message',
+						url: '/n8n/send-message',
 						headers: {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json',
@@ -1156,7 +1162,6 @@ export class WhatsAble implements INodeType {
 									preview_url: enableLinkPreview
 								},
 								type: "text",
-								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
@@ -1230,7 +1235,6 @@ export class WhatsAble implements INodeType {
 									caption: documentCaption,
 									filename: documentFilename
 								},
-								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
@@ -1308,7 +1312,6 @@ export class WhatsAble implements INodeType {
 									link: imageUrl,
 									caption: imageCaption
 								},
-								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
@@ -1386,7 +1389,6 @@ export class WhatsAble implements INodeType {
 									link: videoUrl,
 									caption: videoCaption
 								},
-								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
@@ -1461,7 +1463,6 @@ export class WhatsAble implements INodeType {
 								audio: {
 									link: audioUrl
 								},
-								api_key: '={{$credentials.apiKey}}',
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
@@ -1503,7 +1504,7 @@ export class WhatsAble implements INodeType {
 					const options: IHttpRequestOptions = {
 						method: 'POST',
 						baseURL: BASE_URLS.WHATSABLE,
-						url: '/whatsable_send_message',
+						url: '/whatsable-send-message',
 						headers: {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json',
@@ -1513,7 +1514,6 @@ export class WhatsAble implements INodeType {
 							text: text,
 							attachment: attachment,
 							filename: filename,
-							apiKey: '={{$credentials.apiKey}}',
 						},
 					};
 

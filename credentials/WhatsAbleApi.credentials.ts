@@ -19,8 +19,8 @@ export class WhatsAbleApi implements ICredentialType {
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
-			qs: {
-				apiKey: '={{$credentials.apiKey}}',
+			headers: {
+				Authorization: '={{$credentials.apiKey}}',
 			},
 		},
 	};
