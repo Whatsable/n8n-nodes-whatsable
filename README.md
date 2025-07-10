@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/dist/nodes/WhatsAble/whatsable.png" alt="WhatsAble Logo" width="160"/>
+  <img src="https://d1pnnwteuly8z3.cloudfront.net/images/acc1c175-2e05-4bab-805e-64536550fa04/393f0ca5-e904-41f3-8eee-b2dab6bd4e0d.png" alt="WhatsAble Logo" width="160"/>
 </p>
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
