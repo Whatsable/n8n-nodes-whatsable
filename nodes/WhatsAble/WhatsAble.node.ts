@@ -669,7 +669,7 @@ export class WhatsAble implements INodeType {
 					},
 				},
 				options: WHATSAPP_TIMEZONES,
-				default: 'Asia/Dhaka',
+				default: '',
 				description: 'Timezone for the scheduled date and time',
 			},
 
