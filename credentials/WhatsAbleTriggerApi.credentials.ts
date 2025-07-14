@@ -4,6 +4,7 @@ import {
     ICredentialTestRequest,
     IAuthenticateGeneric,
 } from 'n8n-workflow';
+import { BASE_DOMAIN } from '../shared/constants';
 
 export class WhatsAbleTriggerApi implements ICredentialType {
     name = 'whatsAbleTriggerApi';
@@ -43,7 +44,7 @@ export class WhatsAbleTriggerApi implements ICredentialType {
     // This method is called when the "Test" button is clicked
     test: ICredentialTestRequest = {
         request: {
-            baseURL: 'https://api.insightssystem.com/api:KXAU3bZ4',
+            baseURL: `${BASE_DOMAIN}/api:KXAU3bZ4`,
             url: '/n8n/webhook',
             method: 'POST',
             body: {

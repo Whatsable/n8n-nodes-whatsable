@@ -4,6 +4,7 @@ import {
     ICredentialTestRequest,
     IAuthenticateGeneric,
 } from 'n8n-workflow';
+import { BASE_DOMAIN } from '../shared/constants';
 
 export class WhatsAbleNotifyerApi implements ICredentialType {
     name = 'whatsAbleNotifyerApi';
@@ -43,7 +44,7 @@ export class WhatsAbleNotifyerApi implements ICredentialType {
     // This method is called when the "Test" button is clicked
     test: ICredentialTestRequest = {
         request: {
-            baseURL: 'https://api.insightssystem.com/api:dBShrB6H',
+            baseURL: `${BASE_DOMAIN}/api:dBShrB6H`,
             url: '/n8n',
             method: 'POST',
             body: {

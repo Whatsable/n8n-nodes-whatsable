@@ -12,13 +12,13 @@ import {
 } from 'n8n-workflow';
 
 import { WHATSAPP_TIMEZONES } from './timezones';
+import { BASE_DOMAIN } from '../../shared/constants';
 
-// Base URLs for different endpoints
 const BASE_URLS = {
-	VALIDATION: 'https://api.insightssystem.com/api:gncnl2D6',
-	NOTIFIER: 'https://api.insightssystem.com/api:gncnl2D6',
-	NOTIFYER: 'https://api.insightssystem.com/api:ErOQ8pSj',
-	WHATSABLE: 'https://api.insightssystem.com/api:gncnl2D6',
+	VALIDATION: `${BASE_DOMAIN}/api:gncnl2D6`,
+	NOTIFIER: `${BASE_DOMAIN}/api:gncnl2D6`,
+	NOTIFYER: `${BASE_DOMAIN}/api:ErOQ8pSj`,
+	WHATSABLE: `${BASE_DOMAIN}/api:gncnl2D6`,
 } as const;
 
 export class WhatsAble implements INodeType {
