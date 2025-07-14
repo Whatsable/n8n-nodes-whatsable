@@ -2,6 +2,7 @@ import {
     ICredentialType,
     INodeProperties,
     ICredentialTestRequest,
+    IAuthenticateGeneric,
 } from 'n8n-workflow';
 
 export class WhatsAbleTriggerApi implements ICredentialType {
@@ -30,6 +31,15 @@ export class WhatsAbleTriggerApi implements ICredentialType {
         }
     ];
 
+    authenticate: IAuthenticateGeneric = {
+        type: 'generic',
+        properties: {
+            headers: {
+                Authorization: '={{$credentials.apiKey}}',
+            },
+        },
+    };
+
     // This method is called when the "Test" button is clicked
     test: ICredentialTestRequest = {
         request: {
@@ -40,8 +50,7 @@ export class WhatsAbleTriggerApi implements ICredentialType {
                 url: '={{$credentials.productionWebhookUrl}}'
             },
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': '={{$credentials.apiKey}}'
+                'Content-Type': 'application/json'
             }
         }
     };

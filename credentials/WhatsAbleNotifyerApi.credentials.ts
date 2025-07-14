@@ -2,6 +2,7 @@ import {
     ICredentialType,
     INodeProperties,
     ICredentialTestRequest,
+    IAuthenticateGeneric,
 } from 'n8n-workflow';
 
 export class WhatsAbleNotifyerApi implements ICredentialType {
@@ -30,18 +31,23 @@ export class WhatsAbleNotifyerApi implements ICredentialType {
         }
     ];
 
-    // Fixed forward URL - not user configurable
-    forwardUrl = 'https://api.insightssystem.com/api:dBShrB6H/n8n';
+    authenticate: IAuthenticateGeneric = {
+        type: 'generic',
+        properties: {
+            headers: {
+                Authorization: '={{$credentials.apiKey}}',
+            },
+        },
+    };
 
     // This method is called when the "Test" button is clicked
     test: ICredentialTestRequest = {
         request: {
-            baseURL: this.forwardUrl,
-            url: '',
+            baseURL: 'https://api.insightssystem.com/api:dBShrB6H',
+            url: '/n8n',
             method: 'POST',
             body: {
-                hookUrl: '={{$credentials.productionWebhookUrl}}',
-                api_key: '={{$credentials.apiKey}}'
+                hookUrl: '={{$credentials.productionWebhookUrl}}'
             },
             headers: {
                 'Content-Type': 'application/json'
