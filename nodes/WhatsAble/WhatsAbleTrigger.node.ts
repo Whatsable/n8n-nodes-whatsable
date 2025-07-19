@@ -69,12 +69,12 @@ export class WhatsAbleTrigger implements INodeType {
                         description: 'Use WhatsAble Trigger API for incoming messages',
                     },
                     {
-                        name: 'WhatsAble Notifier API',
+                        name: 'WhatsAble Notifier Trigger API',
                         value: 'notifier',
                         description: 'Use WhatsAble Notifier API for incoming messages',
                     },
                     {
-                        name: 'WhatsAble Notifyer System API',
+                        name: 'WhatsAble Notifyer System Trigger API',
                         value: 'notifyer',
                         description: 'Use WhatsAble Notifyer System API for incoming messages',
                     }

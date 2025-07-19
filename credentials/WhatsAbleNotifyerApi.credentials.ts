@@ -8,7 +8,7 @@ import { BASE_DOMAIN } from '../shared/constants';
 
 export class WhatsAbleNotifyerApi implements ICredentialType {
     name = 'whatsAbleNotifyerApi';
-    displayName = 'WhatsAble Notifyer System API';
+    displayName = 'WhatsAble Notifyer System Trigger API';
     documentationUrl = 'https://docs.whatsable.app/n8n-overview';
     
     // Properties shown in the credentials dialog
@@ -23,7 +23,7 @@ export class WhatsAbleNotifyerApi implements ICredentialType {
             description: 'API Key for WhatsAble',
         },
         {
-            displayName: 'Production Webhook URL',
+            displayName: 'Webhook URL',
             name: 'productionWebhookUrl',
             type: 'string',
             default: '',
