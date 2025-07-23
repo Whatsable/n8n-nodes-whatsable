@@ -1,4 +1,5 @@
 import { IAuthenticateGeneric, ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
+import { BASE_DOMAIN } from '../shared/constants';
 
 export class WhatsAbleApi implements ICredentialType {
 	name = 'whatsAbleApi';
@@ -27,8 +28,8 @@ export class WhatsAbleApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: 'https://api.insightssystem.com',
-			url: '/api:gncnl2D6/check-api-key-across-projects',
+			baseURL: `${BASE_DOMAIN}/api:gncnl2D6`,
+			url: '/check-api-key-across-projects',
 		},
 		rules: [
 			{
