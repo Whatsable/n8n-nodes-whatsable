@@ -1,4 +1,4 @@
-import { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
+import { IAuthenticateGeneric, ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class WhatsAbleApi implements ICredentialType {
 	name = 'whatsAbleApi';
@@ -23,5 +23,22 @@ export class WhatsAbleApi implements ICredentialType {
 				Authorization: '={{$credentials.apiKey}}',
 			},
 		},
+	};
+
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: 'https://api.insightssystem.com',
+			url: '/api:gncnl2D6/check-api-key-across-projects',
+		},
+		rules: [
+			{
+				type: 'responseSuccessBody',
+				properties: {
+					key: 'success',
+					value: false,
+					message: 'Invalid API key',
+				},
+			},
+		],
 	};
 }
