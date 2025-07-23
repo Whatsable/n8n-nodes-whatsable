@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-whatsable",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "WhatsAble is a platform for automating WhatsApp messages, making it easy to start using the WhatsApp API. This node package allows you to use WhatsAble in n8n.",
   "keywords": [
     "n8n-community-node-package",
