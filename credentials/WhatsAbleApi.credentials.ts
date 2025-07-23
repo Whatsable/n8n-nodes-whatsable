@@ -30,6 +30,10 @@ export class WhatsAbleApi implements ICredentialType {
 		request: {
 			baseURL: `${BASE_DOMAIN}/api:gncnl2D6`,
 			url: '/check-api-key-across-projects',
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
 		},
 		rules: [
 			{
