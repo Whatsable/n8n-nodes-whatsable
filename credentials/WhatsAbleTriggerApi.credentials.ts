@@ -53,6 +53,16 @@ export class WhatsAbleTriggerApi implements ICredentialType {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }
+        },
+        rules: [
+            {
+                type: 'responseSuccessBody',
+                properties: {
+                    key: 'success',
+                    value: false,
+                    message: 'Invalid API key',
+                },
+            },
+        ],
     };
 }
