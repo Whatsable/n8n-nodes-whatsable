@@ -93,7 +93,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 					},
 				},
 				typeOptions: {
@@ -178,7 +178,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -196,7 +196,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -216,7 +216,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -244,7 +244,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -261,7 +261,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -274,11 +274,11 @@ export class WhatsAble implements INodeType {
 				displayName: 'Schedule Message',
 				name: 'scheduleTemplateMessage',
 				type: 'boolean',
-				default: false,
+				default: true,
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
@@ -292,8 +292,8 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendNotifyerTemplate'],
-						scheduleTemplateMessage: [true],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
 				description: 'The date and time when the message should be sent',
@@ -306,8 +306,8 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendNotifyerTemplate'],
-						scheduleTemplateMessage: [true],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
 				options: WHATSAPP_TIMEZONES,
@@ -391,7 +391,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -406,7 +406,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -443,7 +443,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['text'],
 					},
@@ -458,7 +458,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -473,7 +473,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -489,7 +489,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -505,7 +505,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['document'],
 					},
@@ -520,7 +520,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -535,7 +535,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -551,7 +551,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['image'],
 					},
@@ -566,7 +566,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -581,7 +581,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -597,7 +597,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['video'],
 					},
@@ -612,7 +612,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['audio'],
 					},
@@ -628,7 +628,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['audio'],
 					},
@@ -643,7 +643,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 						messageType: ['text'],
 					},
@@ -659,7 +659,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -672,11 +672,11 @@ export class WhatsAble implements INodeType {
 				displayName: 'Schedule Message',
 				name: 'scheduleNonTemplateMessage',
 				type: 'boolean',
-				default: false,
+				default: true,
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['scheduleWhatsAppMessage'],
 						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
@@ -690,8 +690,8 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendNonTemplateMessage'],
-						scheduleNonTemplateMessage: [true],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
 				description: 'The date and time when the message should be sent',
@@ -704,8 +704,8 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendNonTemplateMessage'],
-						scheduleNonTemplateMessage: [true],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
 				options: WHATSAPP_TIMEZONES,
@@ -860,36 +860,59 @@ export class WhatsAble implements INodeType {
 					if (response.success === true && response.product) {
 						const product = response.product;
 
+						// Get the current operation to determine which product operations to show
+						const currentOperation = this.getNodeParameter('operation') as string;
+
 						switch (product) {
 							case 'whatsable':
-								returnData.push({
-									name: 'Send Message Via Whatsable',
-									value: 'sendWhatsableMessage',
-									description: 'Send WhatsApp messages via WhatsAble platform',
-									action: 'Send message via whatsable',
-								});
+								if (currentOperation === 'sendWhatsAppMessage') {
+									returnData.push({
+										name: 'Send Message Via Whatsable',
+										value: 'sendWhatsableMessage',
+										description: 'Send WhatsApp messages via WhatsAble platform',
+										action: 'Send message via whatsable',
+									});
+								}
 								break;
 							case 'notifier':
-								returnData.push({
-									name: 'Send Message Via Notifier',
-									value: 'sendMessage',
-									description: 'Send WhatsApp messages with optional attachments',
-									action: 'Send message via notifier',
-								});
+								if (currentOperation === 'sendWhatsAppMessage') {
+									returnData.push({
+										name: 'Send Message Via Notifier',
+										value: 'sendMessage',
+										description: 'Send WhatsApp messages with optional attachments',
+										action: 'Send message via notifier',
+									});
+								}
 								break;
 							case 'notifyer':
-								returnData.push({
-									name: 'Send Template Via Notifyer',
-									value: 'sendNotifyerTemplate',
-									description: 'Send template-based WhatsApp messages',
-									action: 'Send template via notifyer',
-								});
-								returnData.push({
-									name: 'Send Non Template Via Notifyer',
-									value: 'sendNonTemplateMessage',
-									description: 'Send non-template WhatsApp messages',
-									action: 'Send non template via notifyer',
-								});
+								if (currentOperation === 'sendWhatsAppMessage') {
+									returnData.push({
+										name: 'Send Template Via Notifyer',
+										value: 'sendNotifyerTemplate',
+										description: 'Send template-based WhatsApp messages',
+										action: 'Send template via notifyer',
+									});
+									returnData.push({
+										name: 'Send Non Template Via Notifyer',
+										value: 'sendNonTemplateMessage',
+										description: 'Send non-template WhatsApp messages',
+										action: 'Send non template via notifyer',
+									});
+								} else if (currentOperation === 'scheduleWhatsAppMessage') {
+									// For scheduling, only allow notifyer product operations
+									returnData.push({
+										name: 'Send Template Via Notifyer',
+										value: 'sendNotifyerTemplate',
+										description: 'Schedule template-based WhatsApp messages',
+										action: 'Schedule template via notifyer',
+									});
+									returnData.push({
+										name: 'Send Non Template Via Notifyer',
+										value: 'sendNonTemplateMessage',
+										description: 'Schedule non-template WhatsApp messages',
+										action: 'Schedule non template via notifyer',
+									});
+								}
 								break;
 							default:
 								// Fallback for unknown product types
@@ -1541,8 +1564,275 @@ export class WhatsAble implements INodeType {
 					}
 				} else if (operation === 'scheduleWhatsAppMessage') {
 					// Handle scheduled WhatsApp message operation
-					// This can be implemented based on requirements
-					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not yet implemented`);
+					// Get the product operation to determine which specific operation to perform
+					const productOperation = this.getNodeParameter('productOperation', i) as string;
+
+					if (productOperation === 'sendNotifyerTemplate') {
+						// For notifyer product - scheduled template sending
+						const recipient = this.getNodeParameter('notifyerRecipient', i) as string;
+						const templateId = this.getNodeParameter('notifyerTemplate', i) as string;
+						const variablesObj = this.getNodeParameter('notifyerVariables', i) as { value: Record<string, string> };
+						const note = this.getNodeParameter('templateNote', i, '') as string;
+						const labels = this.getNodeParameter('templateLabels', i, []) as string[];
+						const scheduledDateTime = this.getNodeParameter('templateScheduledDateTime', i) as string;
+						const timezone = this.getNodeParameter('templateTimezone', i) as string;
+
+						// Get template data to validate variable counts
+						const templateData = JSON.parse(templateId);
+
+						// Convert ResourceMapper value to variables object with correct format based on template structure
+						const variables: Record<string, string> = {};
+						
+						// Parse the template structure to understand variable mapping
+						const templateComponents = templateData.components.components;
+						
+						// Check for media header
+						const hasMediaHeader = templateComponents.some((c: any) => c.type === 'HEADER' && c.format !== 'TEXT');
+						
+						// Check for URL button
+						const hasUrlButton = templateComponents.some((c: any) => 
+							c.type === 'BUTTONS' && c.buttons && c.buttons.some((b: any) => b.type === 'URL')
+						);
+						
+						// Map variables based on template structure
+						Object.entries(variablesObj.value).forEach(([key, value]) => {
+							if (key === 'media' && hasMediaHeader) {
+								variables['media'] = value;
+							} else if (key === 'visit_website' && hasUrlButton) {
+								variables['visit_website'] = value;
+							} else if (key.startsWith('body')) {
+								// For body variables, keep the bodyN format
+								variables[key] = value;
+							}
+						});
+
+						// Format the date with milliseconds and Z suffix
+						const formattedDate = new Date(scheduledDateTime).toISOString();
+						
+						// Prepare request body for scheduled message
+						const scheduleRequestBody = {
+							template: templateData.template_id,
+							time_zone: timezone,
+							variables: variables,
+							is_schedule: true,
+							phone_number: recipient,
+							schedule_datetime_date: formattedDate,
+							note: note,
+							labels: labels,
+						};
+
+						const options: IHttpRequestOptions = {
+							method: 'POST',
+							baseURL: BASE_URLS.NOTIFYER,
+							url: '/n8n/send-message',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+							},
+							body: scheduleRequestBody,
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
+					} else if (productOperation === 'sendNonTemplateMessage') {
+						// For notifyer product - scheduled non-template message sending
+						const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
+						const messageType = this.getNodeParameter('messageType', i) as string;
+						const labels = this.getNodeParameter('nonTemplateLabels', i, []) as string[];
+						const scheduledTime = this.getNodeParameter('nonTemplateScheduledDateTime', i) as string;
+						const timezone = this.getNodeParameter('nonTemplateTimezone', i) as string;
+						
+						// Format the date with milliseconds and Z suffix
+						const formattedScheduledTime = new Date(scheduledTime).toISOString();
+						
+						// Handle different message types
+						if (messageType === 'text') {
+							const messageContent = this.getNodeParameter('messageContent', i) as string;
+							const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
+							
+							const scheduleRequestBody = {
+								to: recipient,
+								text: {
+									body: messageContent,
+									preview_url: enableLinkPreview
+								},
+								type: "text",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: formattedScheduledTime,
+								labels: labels,
+							};
+							
+							const options: IHttpRequestOptions = {
+								method: 'POST',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/general/send-message',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						} else if (messageType === 'document') {
+							const documentUrl = this.getNodeParameter('documentUrl', i) as string;
+							const documentCaption = this.getNodeParameter('documentCaption', i, '') as string;
+							const documentFilename = this.getNodeParameter('documentFilename', i) as string;
+							
+							const scheduleRequestBody = {
+								to: recipient,
+								document: {
+									link: documentUrl,
+									caption: documentCaption,
+									filename: documentFilename
+								},
+								type: "document",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: formattedScheduledTime,
+								labels: labels,
+							};
+							
+							const options: IHttpRequestOptions = {
+								method: 'POST',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/general/send-message',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						} else if (messageType === 'image') {
+							const imageUrl = this.getNodeParameter('imageUrl', i) as string;
+							const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
+							
+							const scheduleRequestBody = {
+								to: recipient,
+								image: {
+									link: imageUrl,
+									caption: imageCaption
+								},
+								type: "image",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: formattedScheduledTime,
+								labels: labels,
+							};
+							
+							const options: IHttpRequestOptions = {
+								method: 'POST',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/general/send-message',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						} else if (messageType === 'video') {
+							const videoUrl = this.getNodeParameter('videoUrl', i) as string;
+							const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
+							
+							const scheduleRequestBody = {
+								to: recipient,
+								type: "video",
+								video: {
+									link: videoUrl,
+									caption: videoCaption
+								},
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: formattedScheduledTime,
+								labels: labels,
+							};
+							
+							const options: IHttpRequestOptions = {
+								method: 'POST',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/general/send-message',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						} else if (messageType === 'audio') {
+							const audioUrl = this.getNodeParameter('audioUrl', i) as string;
+							
+							const scheduleRequestBody = {
+								to: recipient,
+								audio: {
+									link: audioUrl
+								},
+								type: "audio",
+								time_zone: timezone,
+								is_schedule: true,
+								recipient_type: "individual",
+								messaging_product: "whatsapp",
+								schedule_datetime_date: formattedScheduledTime,
+								labels: labels,
+							};
+							
+							const options: IHttpRequestOptions = {
+								method: 'POST',
+								baseURL: BASE_URLS.NOTIFYER,
+								url: '/n8n/general/send-message',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json',
+								},
+								body: scheduleRequestBody,
+								returnFullResponse: true,
+							};
+
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						}
+					} else {
+						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported for scheduling`);
+					}
 				} else {
 					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not supported`);
 				}
