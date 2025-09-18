@@ -710,7 +710,7 @@ export class WhatsAble implements INodeType {
 						enableConditions: [true],
 					},
 				},
-				description: 'Define conversation-based conditions for message scheduling',
+				description: 'Set conditions to automatically send follow-up messages only when specific criteria are met. The system checks these conditions right before sending to ensure messages are relevant and timely.',
 				typeOptions: {
 					multipleValues: true,
 					multipleValueButtonText: 'Add Condition',
@@ -733,6 +733,18 @@ export class WhatsAble implements INodeType {
 									{
 										name: 'Conversation Paragraph',
 										value: 'convo_para',
+									},
+									{
+										name: 'If Person Did Not Reply Anything',
+										value: 'no_reply',
+									},
+									{
+										name: 'If Person Did Not Send Any Message In The Last 24h',
+										value: 'no_msg_24h',
+									},
+									{
+										name: 'If Person Replied',
+										value: 'person_replied',
 									},
 									{
 										name: 'Last Message Of Bot',
