@@ -699,7 +699,7 @@ export class WhatsAble implements INodeType {
 				description: 'Whether to enable conditions to control when the scheduled message should be sent',
 			},
 			{
-				displayName: 'Pre-Send Conditions (Optional)',
+				displayName: 'Scheduled Message Rules (Conversation-Based)',
 				name: 'conditions',
 				type: 'fixedCollection',
 				default: { values: [{}] },
@@ -710,7 +710,7 @@ export class WhatsAble implements INodeType {
 						enableConditions: [true],
 					},
 				},
-				description: 'Define conditions that must be met for the message to be sent',
+				description: 'Define conversation-based conditions for message scheduling',
 				typeOptions: {
 					multipleValues: true,
 					multipleValueButtonText: 'Add Condition',
@@ -723,9 +723,35 @@ export class WhatsAble implements INodeType {
 							{
 								displayName: 'Field',
 								name: 'field',
-								type: 'string',
-								default: '',
-								description: 'Enter the field name to evaluate',
+								type: 'options',
+								default: 'system_user_last_message_time',
+								options: [
+									{
+										name: 'Bot Last Message Time',
+										value: 'system_user_last_message_time',
+									},
+									{
+										name: 'Conversation Paragraph',
+										value: 'convo_para',
+									},
+									{
+										name: 'Last Message Of Bot',
+										value: 'system_user_last_message',
+									},
+									{
+										name: 'Last Message Of User',
+										value: 'recipient_last_message',
+									},
+									{
+										name: 'Phone Number',
+										value: 'phone_number',
+									},
+									{
+										name: 'User Last Message Time',
+										value: 'user_last_message_time',
+									},
+								],
+								description: 'Select the field to evaluate',
 							},
 							{
 								displayName: 'Operator',
@@ -975,7 +1001,7 @@ export class WhatsAble implements INodeType {
 				],
 			},
 			{
-				displayName: 'Criteria to Schedule Message (Optional)',
+				displayName: 'Scheduled Message Rules (Integration-Based)',
 				name: 'conditions2',
 				type: 'fixedCollection',
 				default: { values: [{}] },
@@ -986,7 +1012,7 @@ export class WhatsAble implements INodeType {
 						enableConditions: [true],
 					},
 				},
-				description: 'Define criteria that must be met to schedule the message',
+				description: 'Define integration-based conditions for message scheduling',
 				typeOptions: {
 					multipleValues: true,
 					multipleValueButtonText: 'Add Condition',
@@ -999,48 +1025,9 @@ export class WhatsAble implements INodeType {
 							{
 								displayName: 'Field',
 								name: 'field',
-								type: 'options',
-								default: 'phone_number',
-								options: [
-									{
-										name: 'Bot Last Message Time',
-										value: 'system_user_last_message_time',
-									},
-									{
-										name: 'Conversation Paragraph',
-										value: 'convo_para',
-									},
-									{
-										name: 'Last Message Of Bot',
-										value: 'system_user_last_message',
-									},
-									{
-										name: 'Last Message Of User',
-										value: 'recipient_last_message',
-									},
-									{
-										name: 'Phone Number',
-										value: 'phone_number',
-									},
-									{
-										name: 'User Last Message Time',
-										value: 'user_last_message_time',
-									},
-								],
-								description: 'Select the field to evaluate',
-							},
-							{
-								displayName: 'Custom Field Name',
-								name: 'customFieldName',
 								type: 'string',
 								default: '',
-								displayOptions: {
-									show: {
-										field: ['custom'],
-									},
-								},
-								description: 'Enter the name of the custom field to evaluate',
-								placeholder: 'e.g., user_status, order_total, etc.',
+								description: 'Enter the field name to evaluate',
 							},
 							{
 								displayName: 'Operator',
@@ -1579,14 +1566,27 @@ export class WhatsAble implements INodeType {
 			const condition = conditions[i];
 			const { field, operator, value } = condition;
 
+			// Skip empty conditions (no field or operator)
+			if (!field || !operator) {
+				continue;
+			}
+
+			// Check if operator needs a value and validate accordingly
+			const operatorNeedsValue = operator !== 'basic:exists' && operator !== 'basic:notexists';
+			
+			// Skip condition if operator needs a value but no value is provided
+			if (operatorNeedsValue && (!value || value.trim() === '')) {
+				continue;
+			}
+
 			// Build condition object with a, o, b structure
 			const conditionObj: any = {
 				a: field,
 				o: operator
 			};
 
-			// Add value (b) only if operator needs it
-			if (operator !== 'basic:exists' && operator !== 'basic:notexists' && value) {
+			// Add value (b) only if operator needs it and value exists
+			if (operatorNeedsValue && value) {
 				conditionObj.b = value;
 			}
 
@@ -1661,12 +1661,20 @@ export class WhatsAble implements INodeType {
 					const conditions1 = conditionsData1.values || [];
 					const conditions2 = conditionsData2.values || [];
 					
-					// Build search payload structure
+					// Build search payload structure (swapped: conversation-based becomes search2, integration-based becomes search1)
 					if (conditions1.length > 0) {
-						searchPayload.search1 = WhatsAble.buildConditionPayload(conditions1);
+						const payload1 = WhatsAble.buildConditionPayload(conditions1);
+						// Only add if there are actual valid conditions in either AND or OR arrays
+						if (payload1[0].length > 0 || payload1[1].length > 0) {
+							searchPayload.search2 = payload1; // Conversation-based (conditions) -> search2
+						}
 					}
 					if (conditions2.length > 0) {
-						searchPayload.search2 = WhatsAble.buildConditionPayload(conditions2);
+						const payload2 = WhatsAble.buildConditionPayload(conditions2);
+						// Only add if there are actual valid conditions in either AND or OR arrays
+						if (payload2[0].length > 0 || payload2[1].length > 0) {
+							searchPayload.search1 = payload2; // Integration-based (conditions2) -> search1
+						}
 					}
 				}
 
