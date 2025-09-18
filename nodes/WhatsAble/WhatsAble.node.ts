@@ -684,6 +684,612 @@ export class WhatsAble implements INodeType {
 				description: 'Timezone for the scheduled date and time',
 			},
 
+			// Condition fields for scheduled messages
+			{
+				displayName: 'Enable Conditions',
+				name: 'enableConditions',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+					},
+				},
+				description: 'Whether to enable conditions to control when the scheduled message should be sent',
+			},
+			{
+				displayName: 'Pre-Send Conditions (Optional)',
+				name: 'conditions',
+				type: 'fixedCollection',
+				default: { values: [{}] },
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						enableConditions: [true],
+					},
+				},
+				description: 'Define conditions that must be met for the message to be sent',
+				typeOptions: {
+					multipleValues: true,
+					multipleValueButtonText: 'Add Condition',
+				},
+				options: [
+					{
+						displayName: 'Condition',
+						name: 'values',
+						values: [
+							{
+								displayName: 'Field',
+								name: 'field',
+								type: 'string',
+								default: '',
+								description: 'Enter the field name to evaluate',
+							},
+							{
+								displayName: 'Operator',
+								name: 'operator',
+								type: 'options',
+								default: 'text:equal',
+								options: [
+									{
+										name: 'Array : Contains',
+										value: 'array:contains',
+									},
+									{
+										name: 'Array : Contains (Ignore Case)',
+										value: 'array:contains:ci',
+									},
+									{
+										name: 'Array : Length Equals',
+										value: 'array:lengthequal',
+									},
+									{
+										name: 'Array : Length Greater Than',
+										value: 'array:lengthgreater',
+									},
+									{
+										name: 'Array : Length Greater Than or Equal',
+										value: 'array:lengthgreaterequal',
+									},
+									{
+										name: 'Array : Length Less Than',
+										value: 'array:lengthless',
+									},
+									{
+										name: 'Array : Length Less Than or Equal',
+										value: 'array:lengthlessequal',
+									},
+									{
+										name: 'Array : Length Not Equals',
+										value: 'array:lengthnotequal',
+									},
+									{
+										name: 'Array : Not Contains',
+										value: 'array:notcontains',
+									},
+									{
+										name: 'Array : Not Contains (Ignore Case)',
+										value: 'array:notcontains:ci',
+									},
+									{
+										name: 'Boolean : Equals',
+										value: 'boolean:equal',
+									},
+									{
+										name: 'Boolean : Not Equals',
+										value: 'boolean:notequal',
+									},
+									{
+										name: 'DateTime : Earlier Than',
+										value: 'datetime:earlier',
+									},
+									{
+										name: 'DateTime : Earlier Than or Equal',
+										value: 'datetime:earlierequal',
+									},
+									{
+										name: 'DateTime : Equals',
+										value: 'datetime:equal',
+									},
+									{
+										name: 'DateTime : Later Than',
+										value: 'datetime:later',
+									},
+									{
+										name: 'DateTime : Later Than or Equal',
+										value: 'datetime:laterequal',
+									},
+									{
+										name: 'DateTime : Not Equals',
+										value: 'datetime:notequal',
+									},
+									{
+										name: 'Exists',
+										value: 'basic:exists',
+									},
+									{
+										name: 'Not Exists',
+										value: 'basic:notexists',
+									},
+									{
+										name: 'Numeric : Equals',
+										value: 'numeric:equal',
+									},
+									{
+										name: 'Numeric : Greater Than',
+										value: 'numeric:greater',
+									},
+									{
+										name: 'Numeric : Greater Than or Equal',
+										value: 'numeric:greaterequal',
+									},
+									{
+										name: 'Numeric : Less Than',
+										value: 'numeric:less',
+									},
+									{
+										name: 'Numeric : Less Than or Equal',
+										value: 'numeric:lessequal',
+									},
+									{
+										name: 'Numeric : Not Equals',
+										value: 'numeric:notequal',
+									},
+									{
+										name: 'Text : Contains',
+										value: 'text:contain',
+									},
+									{
+										name: 'Text : Contains (Ignore Case)',
+										value: 'text:contain:ci',
+									},
+									{
+										name: 'Text : Does Not Contain',
+										value: 'text:notcontain',
+									},
+									{
+										name: 'Text : Ends With',
+										value: 'text:endwith',
+									},
+									{
+										name: 'Text : Ends With (Ignore Case)',
+										value: 'text:endwith:ci',
+									},
+									{
+										name: 'Text : Equals',
+										value: 'text:equal',
+									},
+									{
+										name: 'Text : Equals (Ignore Case)',
+										value: 'text:equal:ci',
+									},
+									{
+										name: 'Text : Matches Pattern',
+										value: 'text:matchpattern',
+									},
+									{
+										name: 'Text : Matches Pattern (Ignore Case)',
+										value: 'text:matchpattern:ci',
+									},
+									{
+										name: 'Text : Not Ends With',
+										value: 'text:notendwith',
+									},
+									{
+										name: 'Text : Not Ends With (Ignore Case)',
+										value: 'text:notendwith:ci',
+									},
+									{
+										name: 'Text : Not Equals',
+										value: 'text:notequal',
+									},
+									{
+										name: 'Text : Not Equals (Ignore Case)',
+										value: 'text:notequal:ci',
+									},
+									{
+										name: 'Text : Not Matches Pattern',
+										value: 'text:notmatchpattern',
+									},
+									{
+										name: 'Text : Not Matches Pattern (Ignore Case)',
+										value: 'text:notmatchpattern:ci',
+									},
+									{
+										name: 'Text : Not Starts With',
+										value: 'text:notstartwith',
+									},
+									{
+										name: 'Text : Not Starts With (Ignore Case)',
+										value: 'text:notstartwith:ci',
+									},
+									{
+										name: 'Text : Starts With',
+										value: 'text:startwith',
+									},
+									{
+										name: 'Text : Starts With (Ignore Case)',
+										value: 'text:startwith:ci',
+									},
+									{
+										name: 'Time : Equals',
+										value: 'time:equal',
+									},
+									{
+										name: 'Time : Greater Than',
+										value: 'time:greater',
+									},
+									{
+										name: 'Time : Greater Than or Equal',
+										value: 'time:greaterequal',
+									},
+									{
+										name: 'Time : Less Than',
+										value: 'time:less',
+									},
+									{
+										name: 'Time : Less Than or Equal',
+										value: 'time:lessequal',
+									},
+									{
+										name: 'Time : Not Equals',
+										value: 'time:notequal',
+									},
+								],
+								description: 'Select the comparison operator',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								displayOptions: {
+									hide: {
+										operator: ['basic:exists', 'basic:notexists'],
+									},
+								},
+								description: 'Enter the value to compare against',
+								placeholder: 'Enter comparison value',
+							},
+							{
+								displayName: 'Operator Type',
+								name: 'operatorType',
+								type: 'options',
+								default: 'AND',
+								options: [
+									{
+										name: 'AND',
+										value: 'AND',
+									},
+									{
+										name: 'OR',
+										value: 'OR',
+									},
+								],
+								description: 'Logical operator to combine with the next condition',
+							},
+						],
+					},
+				],
+			},
+			{
+				displayName: 'Criteria to Schedule Message (Optional)',
+				name: 'conditions2',
+				type: 'fixedCollection',
+				default: { values: [{}] },
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						enableConditions: [true],
+					},
+				},
+				description: 'Define criteria that must be met to schedule the message',
+				typeOptions: {
+					multipleValues: true,
+					multipleValueButtonText: 'Add Condition',
+				},
+				options: [
+					{
+						displayName: 'Condition',
+						name: 'values',
+						values: [
+							{
+								displayName: 'Field',
+								name: 'field',
+								type: 'options',
+								default: 'phone_number',
+								options: [
+									{
+										name: 'Bot Last Message Time',
+										value: 'system_user_last_message_time',
+									},
+									{
+										name: 'Conversation Paragraph',
+										value: 'convo_para',
+									},
+									{
+										name: 'Last Message Of Bot',
+										value: 'system_user_last_message',
+									},
+									{
+										name: 'Last Message Of User',
+										value: 'recipient_last_message',
+									},
+									{
+										name: 'Phone Number',
+										value: 'phone_number',
+									},
+									{
+										name: 'User Last Message Time',
+										value: 'user_last_message_time',
+									},
+								],
+								description: 'Select the field to evaluate',
+							},
+							{
+								displayName: 'Custom Field Name',
+								name: 'customFieldName',
+								type: 'string',
+								default: '',
+								displayOptions: {
+									show: {
+										field: ['custom'],
+									},
+								},
+								description: 'Enter the name of the custom field to evaluate',
+								placeholder: 'e.g., user_status, order_total, etc.',
+							},
+							{
+								displayName: 'Operator',
+								name: 'operator',
+								type: 'options',
+								default: 'text:equal',
+								options: [
+									{
+										name: 'Array : Contains',
+										value: 'array:contains',
+									},
+									{
+										name: 'Array : Contains (Ignore Case)',
+										value: 'array:contains:ci',
+									},
+									{
+										name: 'Array : Length Equals',
+										value: 'array:lengthequal',
+									},
+									{
+										name: 'Array : Length Greater Than',
+										value: 'array:lengthgreater',
+									},
+									{
+										name: 'Array : Length Greater Than or Equal',
+										value: 'array:lengthgreaterequal',
+									},
+									{
+										name: 'Array : Length Less Than',
+										value: 'array:lengthless',
+									},
+									{
+										name: 'Array : Length Less Than or Equal',
+										value: 'array:lengthlessequal',
+									},
+									{
+										name: 'Array : Length Not Equals',
+										value: 'array:lengthnotequal',
+									},
+									{
+										name: 'Array : Not Contains',
+										value: 'array:notcontains',
+									},
+									{
+										name: 'Array : Not Contains (Ignore Case)',
+										value: 'array:notcontains:ci',
+									},
+									{
+										name: 'Boolean : Equals',
+										value: 'boolean:equal',
+									},
+									{
+										name: 'Boolean : Not Equals',
+										value: 'boolean:notequal',
+									},
+									{
+										name: 'DateTime : Earlier Than',
+										value: 'datetime:earlier',
+									},
+									{
+										name: 'DateTime : Earlier Than or Equal',
+										value: 'datetime:earlierequal',
+									},
+									{
+										name: 'DateTime : Equals',
+										value: 'datetime:equal',
+									},
+									{
+										name: 'DateTime : Later Than',
+										value: 'datetime:later',
+									},
+									{
+										name: 'DateTime : Later Than or Equal',
+										value: 'datetime:laterequal',
+									},
+									{
+										name: 'DateTime : Not Equals',
+										value: 'datetime:notequal',
+									},
+									{
+										name: 'Exists',
+										value: 'basic:exists',
+									},
+									{
+										name: 'Not Exists',
+										value: 'basic:notexists',
+									},
+									{
+										name: 'Numeric : Equals',
+										value: 'numeric:equal',
+									},
+									{
+										name: 'Numeric : Greater Than',
+										value: 'numeric:greater',
+									},
+									{
+										name: 'Numeric : Greater Than or Equal',
+										value: 'numeric:greaterequal',
+									},
+									{
+										name: 'Numeric : Less Than',
+										value: 'numeric:less',
+									},
+									{
+										name: 'Numeric : Less Than or Equal',
+										value: 'numeric:lessequal',
+									},
+									{
+										name: 'Numeric : Not Equals',
+										value: 'numeric:notequal',
+									},
+									{
+										name: 'Text : Contains',
+										value: 'text:contain',
+									},
+									{
+										name: 'Text : Contains (Ignore Case)',
+										value: 'text:contain:ci',
+									},
+									{
+										name: 'Text : Does Not Contain',
+										value: 'text:notcontain',
+									},
+									{
+										name: 'Text : Ends With',
+										value: 'text:endwith',
+									},
+									{
+										name: 'Text : Ends With (Ignore Case)',
+										value: 'text:endwith:ci',
+									},
+									{
+										name: 'Text : Equals',
+										value: 'text:equal',
+									},
+									{
+										name: 'Text : Equals (Ignore Case)',
+										value: 'text:equal:ci',
+									},
+									{
+										name: 'Text : Matches Pattern',
+										value: 'text:matchpattern',
+									},
+									{
+										name: 'Text : Matches Pattern (Ignore Case)',
+										value: 'text:matchpattern:ci',
+									},
+									{
+										name: 'Text : Not Ends With',
+										value: 'text:notendwith',
+									},
+									{
+										name: 'Text : Not Ends With (Ignore Case)',
+										value: 'text:notendwith:ci',
+									},
+									{
+										name: 'Text : Not Equals',
+										value: 'text:notequal',
+									},
+									{
+										name: 'Text : Not Equals (Ignore Case)',
+										value: 'text:notequal:ci',
+									},
+									{
+										name: 'Text : Not Matches Pattern',
+										value: 'text:notmatchpattern',
+									},
+									{
+										name: 'Text : Not Matches Pattern (Ignore Case)',
+										value: 'text:notmatchpattern:ci',
+									},
+									{
+										name: 'Text : Not Starts With',
+										value: 'text:notstartwith',
+									},
+									{
+										name: 'Text : Not Starts With (Ignore Case)',
+										value: 'text:notstartwith:ci',
+									},
+									{
+										name: 'Text : Starts With',
+										value: 'text:startwith',
+									},
+									{
+										name: 'Text : Starts With (Ignore Case)',
+										value: 'text:startwith:ci',
+									},
+									{
+										name: 'Time : Equals',
+										value: 'time:equal',
+									},
+									{
+										name: 'Time : Greater Than',
+										value: 'time:greater',
+									},
+									{
+										name: 'Time : Greater Than or Equal',
+										value: 'time:greaterequal',
+									},
+									{
+										name: 'Time : Less Than',
+										value: 'time:less',
+									},
+									{
+										name: 'Time : Less Than or Equal',
+										value: 'time:lessequal',
+									},
+									{
+										name: 'Time : Not Equals',
+										value: 'time:notequal',
+									},
+								],
+								description: 'Select the comparison operator',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								displayOptions: {
+									hide: {
+										operator: ['basic:exists', 'basic:notexists'],
+									},
+								},
+								description: 'Enter the value to compare against',
+								placeholder: 'Enter comparison value',
+							},
+							{
+								displayName: 'Operator Type',
+								name: 'operatorType',
+								type: 'options',
+								default: 'AND',
+								options: [
+									{
+										name: 'AND',
+										value: 'AND',
+									},
+									{
+										name: 'OR',
+										value: 'OR',
+									},
+								],
+								description: 'Logical operator to combine with the next condition',
+							},
+						],
+					},
+				],
+			},
+
 			// Hidden field to store product info
 			{
 				displayName: 'Detected Product',
@@ -960,6 +1566,51 @@ export class WhatsAble implements INodeType {
 		},
 	};
 
+	// Helper function to build condition payload structure
+	private static buildConditionPayload(conditions: any[]): any[][] {
+		if (!conditions || conditions.length === 0) {
+			return [[], []]; // [AND array, OR array]
+		}
+
+		const andConditions: any[] = [];
+		const orConditions: any[] = [];
+
+		for (let i = 0; i < conditions.length; i++) {
+			const condition = conditions[i];
+			const { field, operator, value } = condition;
+
+			// Build condition object with a, o, b structure
+			const conditionObj: any = {
+				a: field,
+				o: operator
+			};
+
+			// Add value (b) only if operator needs it
+			if (operator !== 'basic:exists' && operator !== 'basic:notexists' && value) {
+				conditionObj.b = value;
+			}
+
+			// Determine which array to put this condition in based on operatorType
+			if (i === 0) {
+				// First condition always goes to AND array
+				andConditions.push(conditionObj);
+			} else {
+				// Use the logical operator from the PREVIOUS condition
+				const prevCondition = conditions[i - 1];
+				const prevOperatorType = prevCondition.operatorType || 'AND';
+				
+				if (prevOperatorType === 'AND') {
+					andConditions.push(conditionObj);
+				} else {
+					orConditions.push(conditionObj);
+				}
+			}
+		}
+
+		return [andConditions, orConditions];
+	}
+
+
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
@@ -998,6 +1649,26 @@ export class WhatsAble implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
+
+				// Check if conditions are enabled and build payload (for both immediate and scheduled)
+				const enableConditions = this.getNodeParameter('enableConditions', i, false) as boolean;
+				let searchPayload: any = {};
+				
+				if (enableConditions) {
+					// Get both condition blocks
+					const conditionsData1 = this.getNodeParameter('conditions', i, { values: [] }) as { values: any[] };
+					const conditionsData2 = this.getNodeParameter('conditions2', i, { values: [] }) as { values: any[] };
+					const conditions1 = conditionsData1.values || [];
+					const conditions2 = conditionsData2.values || [];
+					
+					// Build search payload structure
+					if (conditions1.length > 0) {
+						searchPayload.search1 = WhatsAble.buildConditionPayload(conditions1);
+					}
+					if (conditions2.length > 0) {
+						searchPayload.search2 = WhatsAble.buildConditionPayload(conditions2);
+					}
+				}
 
 				let response;
 				if (operation === 'sendWhatsAppMessage') {
@@ -1115,6 +1786,7 @@ export class WhatsAble implements INodeType {
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1150,6 +1822,7 @@ export class WhatsAble implements INodeType {
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1184,6 +1857,7 @@ export class WhatsAble implements INodeType {
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1218,6 +1892,7 @@ export class WhatsAble implements INodeType {
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1250,6 +1925,7 @@ export class WhatsAble implements INodeType {
 								recipient_type: "individual",
 								messaging_product: "whatsapp",
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1358,6 +2034,7 @@ export class WhatsAble implements INodeType {
 							schedule_datetime_date: formattedDate,
 							note: note,
 							labels: labels,
+							...searchPayload, // Add search1 and search2 if conditions are enabled
 						};
 
 						const options: IHttpRequestOptions = {
@@ -1405,6 +2082,7 @@ export class WhatsAble implements INodeType {
 								messaging_product: "whatsapp",
 								schedule_datetime_date: formattedScheduledTime,
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1443,6 +2121,7 @@ export class WhatsAble implements INodeType {
 								messaging_product: "whatsapp",
 								schedule_datetime_date: formattedScheduledTime,
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1479,6 +2158,7 @@ export class WhatsAble implements INodeType {
 								messaging_product: "whatsapp",
 								schedule_datetime_date: formattedScheduledTime,
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1515,6 +2195,7 @@ export class WhatsAble implements INodeType {
 								messaging_product: "whatsapp",
 								schedule_datetime_date: formattedScheduledTime,
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
@@ -1549,6 +2230,7 @@ export class WhatsAble implements INodeType {
 								messaging_product: "whatsapp",
 								schedule_datetime_date: formattedScheduledTime,
 								labels: labels,
+								...searchPayload, // Add search1 and search2 if conditions are enabled
 							};
 							
 							const options: IHttpRequestOptions = {
