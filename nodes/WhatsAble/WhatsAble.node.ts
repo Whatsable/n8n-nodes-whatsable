@@ -1730,7 +1730,7 @@ export class WhatsAble implements INodeType {
 							if (error instanceof NodeApiError && error.description) {
 								// Create a new NodeApiError with the custom message from the API
 								// and add helpful link to Notifier service
-								const cleanMessage = `${error.description}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+								const cleanMessage = `${error.description}`;
 								throw new NodeApiError(this.getNode(), { 
 									message: cleanMessage 
 								});
@@ -1743,14 +1743,14 @@ export class WhatsAble implements INodeType {
 								// Handle different possible error response structures
 								if (errorBody.code === 'ERROR_CODE_ACCESS_DENIED' && errorBody.message) {
 									// Extract the error message from the API response
-									const errorMessage = `${errorBody.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+									const errorMessage = `${errorBody.message}`;
 									// Throw a NodeApiError with the custom message from the API
 									throw new NodeApiError(this.getNode(), { message: errorMessage });
 								}
 								
 								// Handle other structured error responses
 								if (errorBody.message && typeof errorBody.message === 'string') {
-									const errorMessage = `${errorBody.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+									const errorMessage = `${errorBody.message}`;
 									throw new NodeApiError(this.getNode(), { message: errorMessage });
 								}
 								
@@ -1759,11 +1759,11 @@ export class WhatsAble implements INodeType {
 									try {
 										const parsedError = JSON.parse(errorBody);
 										if (parsedError.code === 'ERROR_CODE_ACCESS_DENIED' && parsedError.message) {
-											const errorMessage = `${parsedError.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+											const errorMessage = `${parsedError.message}`;
 											throw new NodeApiError(this.getNode(), { message: errorMessage });
 										}
 										if (parsedError.message) {
-											const errorMessage = `${parsedError.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+											const errorMessage = `${parsedError.message}`;
 											throw new NodeApiError(this.getNode(), { message: errorMessage });
 										}
 									} catch (parseError) {
@@ -2348,8 +2348,8 @@ export class WhatsAble implements INodeType {
 				// Check both instanceof and constructor name for robustness
 				if (error instanceof NodeApiError || error.constructor.name === 'NodeApiError') {
 					// Check if this is a generic "Forbidden" error that needs custom message
-					if (error.message.includes('Forbidden - perhaps check your credentials?') && error.description) {
-						const cleanMessage = `${error.description}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+						if (error.message.includes('Forbidden - perhaps check your credentials?') && error.description) {
+							const cleanMessage = `${error.description}`;
 						throw new NodeApiError(this.getNode(), { message: cleanMessage });
 					}
 					throw error;
