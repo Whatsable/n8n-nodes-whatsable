@@ -1716,13 +1716,65 @@ export class WhatsAble implements INodeType {
 								attachment: attachment,
 								filename: filename,
 							},
+							returnFullResponse: true, // This ensures we get the full response including status codes
 						};
 
-						response = await this.helpers.httpRequestWithAuthentication.call(
-							this,
-							'whatsAbleApi',
-							options,
-						);
+						try {
+							response = await this.helpers.httpRequestWithAuthentication.call(
+								this,
+								'whatsAbleApi',
+								options,
+							);
+						} catch (error) {
+							// Check if this is already a NodeApiError with custom description
+							if (error instanceof NodeApiError && error.description) {
+								// Create a new NodeApiError with the custom message from the API
+								// and add helpful link to Notifier service
+								const cleanMessage = `${error.description}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+								throw new NodeApiError(this.getNode(), { 
+									message: cleanMessage 
+								});
+							}
+							
+							// Check if the error response contains specific error information
+							if (error.response && error.response.body) {
+								const errorBody = error.response.body;
+								
+								// Handle different possible error response structures
+								if (errorBody.code === 'ERROR_CODE_ACCESS_DENIED' && errorBody.message) {
+									// Extract the error message from the API response
+									const errorMessage = `${errorBody.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+									// Throw a NodeApiError with the custom message from the API
+									throw new NodeApiError(this.getNode(), { message: errorMessage });
+								}
+								
+								// Handle other structured error responses
+								if (errorBody.message && typeof errorBody.message === 'string') {
+									const errorMessage = `${errorBody.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+									throw new NodeApiError(this.getNode(), { message: errorMessage });
+								}
+								
+								// Handle JSON string error responses
+								if (typeof errorBody === 'string') {
+									try {
+										const parsedError = JSON.parse(errorBody);
+										if (parsedError.code === 'ERROR_CODE_ACCESS_DENIED' && parsedError.message) {
+											const errorMessage = `${parsedError.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+											throw new NodeApiError(this.getNode(), { message: errorMessage });
+										}
+										if (parsedError.message) {
+											const errorMessage = `${parsedError.message}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+											throw new NodeApiError(this.getNode(), { message: errorMessage });
+										}
+									} catch (parseError) {
+										// If parsing fails, continue with original error handling
+									}
+								}
+							}
+							
+							// For other errors, re-throw the original error
+							throw error;
+						}
 					} else if (productOperation === 'sendNotifyerTemplate') {
 						// For notifyer product - template sending
 						const recipient = this.getNodeParameter('notifyerRecipient', i) as string;
@@ -2291,6 +2343,16 @@ export class WhatsAble implements INodeType {
 						pairedItem: { item: i },
 					});
 					continue;
+				}
+				// If it's already a NodeApiError, check if we need to update the message
+				// Check both instanceof and constructor name for robustness
+				if (error instanceof NodeApiError || error.constructor.name === 'NodeApiError') {
+					// Check if this is a generic "Forbidden" error that needs custom message
+					if (error.message.includes('Forbidden - perhaps check your credentials?') && error.description) {
+						const cleanMessage = `${error.description}\n\nVisit https://notifier.whatsable.app to manage your account and credits.`;
+						throw new NodeApiError(this.getNode(), { message: cleanMessage });
+					}
+					throw error;
 				}
 				throw new NodeOperationError(this.getNode(), error, { itemIndex: i });
 			}
