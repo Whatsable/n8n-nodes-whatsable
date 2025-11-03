@@ -47,6 +47,15 @@ export class WhatsAbleTrigger implements INodeType {
                     },
                 },
             },
+            {
+                name: 'whatsAbleNotifyerSystemAllApi',
+                required: true,
+                displayOptions: {
+                    show: {
+                        credentialType: ['notifyerSystemAll'],
+                    },
+                },
+            },
         ],
         webhooks: [
             {
@@ -77,6 +86,11 @@ export class WhatsAbleTrigger implements INodeType {
                         name: 'WhatsAble Notifyer System Trigger API',
                         value: 'notifyer',
                         description: 'Use WhatsAble Notifyer System API for incoming messages',
+                    },
+                    {
+                        name: 'Notifyer System Incoming & Outgoing Trigger API',
+                        value: 'notifyerSystemAll',
+                        description: 'Use WhatsAble Notifyer System API for incoming & Outgoing messages',
                     }
                 ],
                 default: 'whatsableTrigger',
