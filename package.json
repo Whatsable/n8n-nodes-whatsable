@@ -46,6 +46,7 @@
       "dist/credentials/WhatsAbleApi.credentials.js",
       "dist/credentials/WhatsAbleNotifierApi.credentials.js",
       "dist/credentials/WhatsAbleNotifyerApi.credentials.js",
+      "dist/credentials/WhatsAbleNotifyerSystemAllApi.credentials.js",
       "dist/credentials/WhatsAbleTriggerApi.credentials.js"
     ],
     "nodes": [
