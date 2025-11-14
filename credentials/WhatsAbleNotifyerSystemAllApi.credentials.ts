@@ -45,7 +45,7 @@ export class WhatsAbleNotifyerSystemAllApi implements ICredentialType {
     test: ICredentialTestRequest = {
         request: {
             baseURL: `${BASE_DOMAIN}/api:ErOQ8pSj`,
-            url: '/n8n/webhook',
+            url: '/n8n/webhook/io',
             method: 'POST',
             body: {
                 url: '={{$credentials.productionWebhookUrl}}'

@@ -7,12 +7,12 @@ import {
 
 export class WhatsAbleTrigger implements INodeType {
     description: INodeTypeDescription = {
-        displayName: 'Incoming message Trigger',
+        displayName: 'Incoming/outgoing WhatsApp message Trigger',
         name: 'whatsAbleTrigger',
         icon: 'file:whatsable.svg',
         group: ['trigger'],
         version: 1,
-        subtitle: 'Incoming Message',
+        subtitle: 'Incoming/outgoing WhatsApp message',
         description: 'Triggers when receiving messages from WhatsAble services',
         defaults: {
             name: 'WhatsAble Trigger',
@@ -73,24 +73,24 @@ export class WhatsAbleTrigger implements INodeType {
                 type: 'options',
                 options: [
                     {
-                        name: 'WhatsAble Trigger API',
+                        name: 'WhatsAble Incoming Message',
                         value: 'whatsableTrigger',
                         description: 'Use WhatsAble Trigger API for incoming messages',
                     },
                     {
-                        name: 'WhatsAble Notifier Trigger API',
+                        name: 'Notifier Incoming Message',
                         value: 'notifier',
-                        description: 'Use WhatsAble Notifier API for incoming messages',
+                        description: 'Use Notifier API for incoming messages',
                     },
                     {
-                        name: 'WhatsAble Notifyer System Trigger API',
+                        name: 'Notifyer System Incoming Message',
                         value: 'notifyer',
-                        description: 'Use WhatsAble Notifyer System API for incoming messages',
+                        description: 'Use Notifyer System API for incoming messages',
                     },
                     {
-                        name: 'Notifyer System Incoming & Outgoing Trigger API',
+                        name: 'Notifyer System Incoming & Outgoing Message',
                         value: 'notifyerSystemAll',
-                        description: 'Use WhatsAble Notifyer System API for incoming & Outgoing messages',
+                        description: 'Use Notifyer System API for incoming & Outgoing messages',
                     }
                 ],
                 default: 'whatsableTrigger',
