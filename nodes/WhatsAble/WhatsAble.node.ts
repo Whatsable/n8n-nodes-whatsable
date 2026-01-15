@@ -12,7 +12,7 @@ import {
 } from 'n8n-workflow';
 
 import { WHATSAPP_TIMEZONES } from './timezones';
-import { BASE_DOMAIN } from '../../shared/constants';
+import { BASE_DOMAIN,  WHATSABLE_DASHBOARD_BASE_DOMAIN } from '../../shared/constants';
 
 const BASE_URLS = {
 	VALIDATION: `${BASE_DOMAIN}/api:gncnl2D6`,
@@ -79,6 +79,12 @@ export class WhatsAble implements INodeType {
 						description: 'Schedule WhatsApp messages for later delivery',
 						action: 'Schedule whatsapp message',
 					},
+					{
+						name: 'Send WhatsApp Message to a Group',
+						value: 'sendWhatsAppMessageToGroup',
+						description: 'Send WhatsApp messages to a group',
+						action: 'Send whatsapp message to a group',
+					},
 				],
 				default: 'sendWhatsAppMessage',
 				required: true,
@@ -91,7 +97,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage', 'sendWhatsAppMessageToGroup'],
 					},
 				},
 				typeOptions: {
@@ -363,6 +369,44 @@ export class WhatsAble implements INodeType {
 					},
 				},
 				description: 'Filename for the attachment',
+				default: '',
+			},
+
+			// Fields for whatsable product - Send Group Message
+			{
+				displayName: 'Group Name or ID',
+				name: 'whatsableGroup',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getGroups',
+				},
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessageToGroup'],
+						productOperation: ['sendWhatsableGroupMessage'],
+					},
+				},
+				description: 'Select a group to send message to. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				default: '',
+			},
+			{
+				displayName: 'Message',
+				name: 'whatsableGroupMessage',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessageToGroup'],
+						productOperation: ['sendWhatsableGroupMessage'],
+					},
+				},
+				description: 'Message text content',
+				typeOptions: {
+					rows: 4,
+				},
 				default: '',
 			},
 
@@ -1443,6 +1487,13 @@ export class WhatsAble implements INodeType {
 										description: 'Send WhatsApp messages via WhatsAble platform',
 										action: 'Send message via whatsable',
 									});
+								} else if (currentOperation === 'sendWhatsAppMessageToGroup') {
+									returnData.push({
+										name: 'Send WhatsApp message to a group via whatsable',
+										value: 'sendWhatsableGroupMessage',
+										description: 'Send WhatsApp messages to a group',
+										action: 'Send WhatsApp message to a group',
+									});
 								}
 								break;
 							case 'notifier':
@@ -1554,6 +1605,58 @@ export class WhatsAble implements INodeType {
 						name: `Error: ${error.message}`,
 						value: 'error',
 						description: 'Failed to load labels',
+					});
+				}
+
+				return returnData;
+			},
+
+			async getGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				try {
+					// Get groups from WhatsAble dashboard API
+					const groupsOptions: IHttpRequestOptions = {
+						method: 'GET',
+						baseURL: WHATSABLE_DASHBOARD_BASE_DOMAIN,
+						url: `/api/groups/automation/groups`,
+						headers: {
+							'Accept': 'application/json',
+						},
+					};
+
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						groupsOptions,
+					);
+
+					// Process groups from response
+					if (response.groups && Array.isArray(response.groups)) {
+						for (const group of response.groups) {
+							if (group.label_name && group.value_for) {
+								returnData.push({
+									name: group.label_name,
+									value: JSON.stringify({
+										group_id: group.value_for,
+										session_id: group.session_id,
+									}),
+									description: `Group ID: ${group.value_for}`,
+								});
+							}
+						}
+					} else {
+						returnData.push({
+							name: 'No groups found',
+							value: 'notfound',
+							description: 'No groups were found for this user',
+						});
+					}
+				} catch (error) {
+					returnData.push({
+						name: `Error: ${error.message}`,
+						value: 'error',
+						description: 'Failed to load groups',
 					});
 				}
 
@@ -2325,6 +2428,43 @@ export class WhatsAble implements INodeType {
 						}
 					} else {
 						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported for scheduling`);
+					}
+				} else if (operation === 'sendWhatsAppMessageToGroup') {
+					// Handle send WhatsApp message to group operation
+					const productOperation = this.getNodeParameter('productOperation', i) as string;
+
+					if (productOperation === 'sendWhatsableGroupMessage') {
+						// For whatsable product - send message to group
+						const groupData = this.getNodeParameter('whatsableGroup', i) as string;
+						const message = this.getNodeParameter('whatsableGroupMessage', i) as string;
+
+						// Parse group data
+						const groupInfo = JSON.parse(groupData);
+						const groupId = groupInfo.group_id;
+						const sessionId = groupInfo.session_id;
+
+						const options: IHttpRequestOptions = {
+							method: 'POST',
+							baseURL: WHATSABLE_DASHBOARD_BASE_DOMAIN,
+							url: '/api/whatsapp/messages/v2.0.0/group-send',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+							},
+							body: {
+								groupId: groupId,
+								message: message,
+								session: sessionId,
+							},
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
+					} else {
+						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported for group messages`);
 					}
 				} else {
 					throw new NodeOperationError(this.getNode(), `Operation ${operation} is not supported`);
