@@ -728,6 +728,60 @@ export class WhatsAble implements INodeType {
 				description: 'Timezone for the scheduled date and time',
 			},
 
+			// Fields for notifyer product - Update Contact
+			{
+				displayName: 'Phone Number Name or ID',
+				name: 'updateContactPhoneNumber',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getPhoneNumbers',
+				},
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['updateContact'],
+					},
+				},
+				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+				default: '',
+			},
+			{
+				displayName: 'Add a Note',
+				name: 'updateContactNote',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['updateContact'],
+					},
+				},
+				description: 'Optional note to add to the contact',
+				typeOptions: {
+					rows: 2,
+				},
+			},
+			{
+				displayName: 'Label Names or IDs',
+				name: 'updateContactLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['updateContact'],
+					},
+				},
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
+				},
+			},
+
 			// Condition fields for scheduled messages
 			{
 				displayName: 'Enable Conditions',
@@ -1520,6 +1574,12 @@ export class WhatsAble implements INodeType {
 										description: 'Send non-template WhatsApp messages',
 										action: 'Send non template via notifyer',
 									});
+									returnData.push({
+										name: 'Update Contact',
+										value: 'updateContact',
+										description: 'Update contact details',
+										action: 'Update contact',
+									});
 								} else if (currentOperation === 'scheduleWhatsAppMessage') {
 									returnData.push({
 										name: 'Send Template Via Notifyer',
@@ -1605,6 +1665,55 @@ export class WhatsAble implements INodeType {
 						name: `Error: ${error.message}`,
 						value: 'error',
 						description: 'Failed to load labels',
+					});
+				}
+
+				return returnData;
+			},
+
+			async getPhoneNumbers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				try {
+					// Get phone numbers
+					const phoneNumbersOptions: IHttpRequestOptions = {
+						method: 'GET',
+						baseURL: BASE_URLS.NOTIFYER,
+						url: `/n8n/phone/number/list`,
+						headers: {
+							'Accept': 'application/json',
+						},
+					};
+
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						phoneNumbersOptions,
+					);
+
+					// Process phone numbers from response
+					if (Array.isArray(response)) {
+						for (const phoneNumber of response) {
+							if (phoneNumber.phone_number_value) {
+								returnData.push({
+									name: phoneNumber.phone_number_label || phoneNumber.phone_number_value,
+									value: phoneNumber.phone_number_value,
+									description: 'Phone number',
+								});
+							}
+						}
+					} else {
+						returnData.push({
+							name: 'No phone numbers found',
+							value: 'notfound',
+							description: 'No phone numbers were found for this user',
+						});
+					}
+				} catch (error) {
+					returnData.push({
+						name: `Error: ${error.message}`,
+						value: 'error',
+						description: 'Failed to load phone numbers',
 					});
 				}
 
@@ -2121,6 +2230,43 @@ export class WhatsAble implements INodeType {
 								options,
 							);
 						}
+					} else if (productOperation === 'updateContact') {
+						// For notifyer product - Update Contact
+						const phoneNumber = this.getNodeParameter('updateContactPhoneNumber', i) as string;
+						const note = this.getNodeParameter('updateContactNote', i, '') as string;
+						const labels = this.getNodeParameter('updateContactLabels', i, []) as string[];
+
+						const requestBody: Record<string, any> = {
+							phone_number: phoneNumber,
+						};
+
+						// Add note if provided
+						if (note) {
+							requestBody.note = note;
+						}
+
+						// Add labels if provided (as JSON array)
+						if (labels && labels.length > 0) {
+							requestBody.labels = labels;
+						}
+
+						const options: IHttpRequestOptions = {
+							method: 'PUT',
+							baseURL: BASE_URLS.NOTIFYER,
+							url: '/n8n/recipient/details/update',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+							},
+							body: requestBody,
+							returnFullResponse: true,
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
 					} else if (productOperation === 'sendWhatsableMessage') {
 						// For whatsable product
 						const to = this.getNodeParameter('whatsableTo', i) as string;
