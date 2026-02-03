@@ -765,7 +765,7 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
-				displayName: 'Label Names or IDs',
+				displayName: 'Add and Remove Labels Name of IDs',
 				name: 'updateContactLabels',
 				type: 'multiOptions',
 				default: [],
@@ -778,7 +778,7 @@ export class WhatsAble implements INodeType {
 				},
 				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
-					loadOptionsMethod: 'getLabels',
+					loadOptionsMethod: 'getLabelsForUpdateContact',
 				},
 			},
 
@@ -1671,6 +1671,52 @@ export class WhatsAble implements INodeType {
 				return returnData;
 			},
 
+			async getLabelsForUpdateContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				// Add "Remove All" option first
+				returnData.push({
+					name: 'Remove All',
+					value: '__REMOVE_ALL__',
+					description: 'Remove all labels from the contact',
+				});
+
+				try {
+					// Get labels
+					const labelsOptions: IHttpRequestOptions = {
+						method: 'GET',
+						baseURL: BASE_URLS.NOTIFYER,
+						url: `/n8n/label`,
+						headers: {
+							'Accept': 'application/json',
+						},
+					};
+
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'whatsAbleApi',
+						labelsOptions,
+					);
+
+					// Process labels from response
+					if (Array.isArray(response)) {
+						for (const label of response) {
+							if (label.label) {
+								returnData.push({
+									name: label.label,
+									value: label.label,
+									description: 'Label',
+								});
+							}
+						}
+					}
+				} catch (error) {
+					// If loading labels fails, still keep "Remove All" option
+				}
+
+				return returnData;
+			},
+
 			async getPhoneNumbers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 
@@ -2245,9 +2291,19 @@ export class WhatsAble implements INodeType {
 							requestBody.note = note;
 						}
 
-						// Add labels if provided (as JSON array)
+						// Handle labels: if "Remove All" is selected, send empty array
+						// Otherwise, filter out "__REMOVE_ALL__" if present and send remaining labels
 						if (labels && labels.length > 0) {
-							requestBody.labels = labels;
+							if (labels.includes('__REMOVE_ALL__')) {
+								// "Remove All" is selected - send empty array
+								requestBody.labels = [];
+							} else {
+								// Filter out "__REMOVE_ALL__" if somehow present and send other labels
+								const filteredLabels = labels.filter(label => label !== '__REMOVE_ALL__');
+								if (filteredLabels.length > 0) {
+									requestBody.labels = filteredLabels;
+								}
+							}
 						}
 
 						const options: IHttpRequestOptions = {
