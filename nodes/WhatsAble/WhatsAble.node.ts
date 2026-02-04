@@ -765,7 +765,7 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
-				displayName: 'Add and Remove Labels Name of IDs',
+				displayName: 'Add or Remove Labels',
 				name: 'updateContactLabels',
 				type: 'multiOptions',
 				default: [],
@@ -779,6 +779,23 @@ export class WhatsAble implements INodeType {
 				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getLabelsForUpdateContact',
+				},
+			},
+			{
+				displayName: 'Select Labels to Remove',
+				name: 'selectRemoveLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['updateContact'],
+					},
+				},
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
 				},
 			},
 
@@ -2281,6 +2298,7 @@ export class WhatsAble implements INodeType {
 						const phoneNumber = this.getNodeParameter('updateContactPhoneNumber', i) as string;
 						const note = this.getNodeParameter('updateContactNote', i, '') as string;
 						const labels = this.getNodeParameter('updateContactLabels', i, []) as string[];
+						const selectedRemoveLabels = this.getNodeParameter('selectRemoveLabels', i, []) as string[];
 
 						const requestBody: Record<string, any> = {
 							phone_number: phoneNumber,
@@ -2291,20 +2309,17 @@ export class WhatsAble implements INodeType {
 							requestBody.note = note;
 						}
 
-						// Handle labels: if "Remove All" is selected, send empty array
-						// Otherwise, filter out "__REMOVE_ALL__" if present and send remaining labels
-						if (labels && labels.length > 0) {
-							if (labels.includes('__REMOVE_ALL__')) {
-								// "Remove All" is selected - send empty array
-								requestBody.labels = [];
-							} else {
-								// Filter out "__REMOVE_ALL__" if somehow present and send other labels
-								const filteredLabels = labels.filter(label => label !== '__REMOVE_ALL__');
-								if (filteredLabels.length > 0) {
-									requestBody.labels = filteredLabels;
-								}
-							}
+						if (!labels || labels.length === 0) {
+							requestBody.labels = [];
+						} else if (labels.includes('__REMOVE_ALL__')) {
+							requestBody.labels = ['__REMOVE_ALL__'];
+						} else {
+							requestBody.labels = labels.filter((label: string) => label !== '__REMOVE_ALL__');
 						}
+
+						requestBody.selected_labels = selectedRemoveLabels && selectedRemoveLabels.length > 0 
+							? selectedRemoveLabels 
+							: [];
 
 						const options: IHttpRequestOptions = {
 							method: 'PUT',
