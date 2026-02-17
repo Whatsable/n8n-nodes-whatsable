@@ -29,7 +29,7 @@ export class WhatsAble implements INodeType {
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
-		description: 'Automate WhatsApp messages',
+		description: 'Send & Schedule WhatsApp messages using the official WhatsApp API and have human/AI collaboration',
 		defaults: {
 			name: 'WhatsAble',
 		},
