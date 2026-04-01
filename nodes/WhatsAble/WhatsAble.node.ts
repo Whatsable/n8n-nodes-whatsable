@@ -21,6 +21,14 @@ const BASE_URLS = {
 	WHATSABLE: `${BASE_DOMAIN}/api:gncnl2D6`,
 } as const;
 
+/**
+ * Notifyer scheduled-template API expects `schedule_datetime_date` as UTC ISO without milliseconds.
+ * Parses a datetime string (from the UI) and returns `YYYY-MM-DDTHH:mm:ssZ`.
+ */
+function formatScheduleDatetimeUtcIso(isoLike: string): string {
+	return new Date(isoLike).toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 export class WhatsAble implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'WhatsAble',
@@ -275,6 +283,73 @@ export class WhatsAble implements INodeType {
 			},
 
 			{
+				displayName: 'Schedule Type : Relative or Specific',
+				name: 'notifyerScheduleTypeSpecific',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'Whether to schedule at a specific date and time (on) or after a relative delay from now (off)',
+			},
+			{
+				displayName: 'Unit of Time',
+				name: 'notifyerUnitOfTime',
+				type: 'options',
+				required: true,
+				options: [
+					{ name: '', value: '' },
+					{ name: 'Days', value: 'days' },
+					{ name: 'Hours', value: 'hours' },
+					{ name: 'Minutes', value: 'min' },
+				],
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+						notifyerScheduleTypeSpecific: [false],
+					},
+				},
+			},
+			{
+				displayName: 'Number',
+				name: 'notifyerUnitOfTimeValue',
+				type: 'options',
+				required: true,
+				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items -- numeric ascending order for UX
+				options: [
+					{ name: '', value: '' },
+					{ name: '1', value: 1 },
+					{ name: '2', value: 2 },
+					{ name: '3', value: 3 },
+					{ name: '4', value: 4 },
+					{ name: '5', value: 5 },
+					{ name: '10', value: 10 },
+					{ name: '15', value: 15 },
+					{ name: '20', value: 20 },
+					{ name: '30', value: 30 },
+					{ name: '60', value: 60 },
+					{ name: '90', value: 90 },
+					{ name: '120', value: 120 },
+				],
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+						notifyerScheduleTypeSpecific: [false],
+					},
+				},
+			},
+
+			{
 				displayName: 'Scheduled Date and Time',
 				name: 'templateScheduledDateTime',
 				type: 'dateTime',
@@ -284,15 +359,44 @@ export class WhatsAble implements INodeType {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
 						productOperation: ['sendNotifyerTemplate'],
+						notifyerScheduleTypeSpecific: [true],
 					},
 				},
-				description: 'The date and time when the message should be sent',
 				default: '',
 			},
 			{
 				displayName: 'Timezone',
 				name: 'templateTimezone',
 				type: 'options',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+						notifyerScheduleTypeSpecific: [true],
+					},
+				},
+				options: WHATSAPP_TIMEZONES,
+				default: '',
+			},
+			{
+				displayName: 'Recipient Reply Status : Send Only If',
+				name: 'notifyerRecipientReplyCondition',
+				type: 'options',
+				default: '',
+				options: [
+					{ name: '', value: '' },
+					{ name: 'The Recipient Did Not Reply in 12 Hrs', value: '12h' },
+					{ name: 'The Recipient Did Not Reply in 20 Mins', value: '20m' },
+					{ name: 'The Recipient Did Not Reply in 24 Hrs', value: '24h' },
+					{ name: 'The Recipient Did Not Reply in 3 Hrs', value: '3h' },
+					{ name: 'The Recipient Did Not Reply in 45 Mins', value: '45m' },
+					{ name: 'The Recipient Did Not Reply in 48 Hrs', value: '48h' },
+					{ name: 'The Recipient Did Not Reply in 6 Hrs', value: '6h' },
+					{ name: 'The Recipient Did Not Reply in 72 Hrs', value: '72h' },
+					{ name: 'The Recipient Did Not Reply Since My Last Message', value: '0m' },
+				],
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
@@ -300,11 +404,44 @@ export class WhatsAble implements INodeType {
 						productOperation: ['sendNotifyerTemplate'],
 					},
 				},
-				options: WHATSAPP_TIMEZONES,
-				default: '',
-				description: 'Timezone for the scheduled date and time',
+				description: 'Optional: add to the request only when a value is selected',
 			},
-			
+			{
+				displayName: 'Label Status : Include or Exclude',
+				name: 'notifyerLabelConditionStatus',
+				type: 'options',
+				default: '',
+				options: [
+					{ name: '', value: '' },
+					{ name: 'Include', value: 'include' },
+					{ name: 'Does Not Include', value: 'not' },
+				],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'How selected labels apply to the condition (used with Labels below)',
+			},
+			{
+				displayName: 'Label Names or IDs',
+				name: 'notifyerConditionTwoLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+					},
+				},
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
+				},
+			},
 
 			// Fields for whatsable product
 			{
@@ -809,6 +946,7 @@ export class WhatsAble implements INodeType {
 					show: {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
 					},
 				},
 				description: 'Whether to enable conditions to control when the scheduled message should be sent',
@@ -822,6 +960,7 @@ export class WhatsAble implements INodeType {
 					show: {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
 						enableConditions: [true],
 					},
 				},
@@ -1136,6 +1275,7 @@ export class WhatsAble implements INodeType {
 					show: {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
 						enableConditions: [true],
 					},
 				},
@@ -1839,7 +1979,6 @@ export class WhatsAble implements INodeType {
 			getTemplateVariables,
 		},
 	};
-
 	// Helper function to build condition payload structure
 	private static buildConditionPayload(conditions: any[]): any[][] {
 		if (!conditions || conditions.length === 0) {
@@ -1885,7 +2024,7 @@ export class WhatsAble implements INodeType {
 				// Use the logical operator from the PREVIOUS condition
 				const prevCondition = conditions[i - 1];
 				const prevOperatorType = prevCondition.operatorType || 'AND';
-				
+
 				if (prevOperatorType === 'AND') {
 					andConditions.push(conditionObj);
 				} else {
@@ -1896,7 +2035,6 @@ export class WhatsAble implements INodeType {
 
 		return [andConditions, orConditions];
 	}
-
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
@@ -1936,13 +2074,13 @@ export class WhatsAble implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
+				const productOperationForPayload = this.getNodeParameter('productOperation', i, '') as string;
 
 				// Check if conditions are enabled and build payload (for both immediate and scheduled)
 				const enableConditions = this.getNodeParameter('enableConditions', i, false) as boolean;
-				let searchPayload: any = {};
-				
-				if (enableConditions) {
-					// Get both condition blocks
+				let searchPayload: Record<string, unknown> = {};
+
+				if (enableConditions && productOperationForPayload === 'sendNonTemplateMessage') {
 					const conditionsData1 = this.getNodeParameter('conditions', i, { values: [] }) as { values: any[] };
 					const conditionsData2 = this.getNodeParameter('conditions2', i, { values: [] }) as { values: any[] };
 					const conditions1 = conditionsData1.values || [];
@@ -2089,7 +2227,7 @@ export class WhatsAble implements INodeType {
 
 						// Send template message immediately
 						const requestBody = {
-							template: templateData.template_id,
+							templateId: templateData.template_id,
 							variables: variables,
 							phone_number: recipient,
 							note: note,
@@ -2099,7 +2237,7 @@ export class WhatsAble implements INodeType {
 						const options: IHttpRequestOptions = {
 							method: 'POST',
 							baseURL: BASE_URLS.NOTIFYER,
-							url: '/n8n/send-message',
+							url: '/n8n/messages/send',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
@@ -2381,8 +2519,7 @@ export class WhatsAble implements INodeType {
 						const variablesObj = this.getNodeParameter('notifyerVariables', i) as { value: Record<string, string> };
 						const note = this.getNodeParameter('templateNote', i, '') as string;
 						const labels = this.getNodeParameter('templateLabels', i, []) as string[];
-						const scheduledDateTime = this.getNodeParameter('templateScheduledDateTime', i) as string;
-						const timezone = this.getNodeParameter('templateTimezone', i) as string;
+						const scheduleTypeSpecific = this.getNodeParameter('notifyerScheduleTypeSpecific', i, false) as boolean;
 
 						// Get template data to validate variable counts
 						const templateData = JSON.parse(templateId);
@@ -2413,26 +2550,57 @@ export class WhatsAble implements INodeType {
 							}
 						});
 
-						// Format the date with milliseconds and Z suffix
-						const formattedDate = new Date(scheduledDateTime).toISOString();
-						
-						// Prepare request body for scheduled message
-						const scheduleRequestBody = {
-							template: templateData.template_id,
-							time_zone: timezone,
+						// Scheduled notifyer template: core fields + either fixed datetime or relative delay.
+						const scheduleRequestBody: Record<string, unknown> = {
+							templateId: templateData.template_id,
 							variables: variables,
 							is_schedule: true,
 							phone_number: recipient,
-							schedule_datetime_date: formattedDate,
 							note: note,
 							labels: labels,
-							...searchPayload, // Add search1 and search2 if conditions are enabled
+							schedule_type: scheduleTypeSpecific ? 'specific' : 'relative',
 						};
+
+						// specific: `schedule_datetime_date` + `time_zone`; relative: `unit_of_time_*` only.
+						if (scheduleTypeSpecific) {
+							const scheduledDateTime = this.getNodeParameter('templateScheduledDateTime', i) as string;
+							const timezone = this.getNodeParameter('templateTimezone', i) as string;
+							scheduleRequestBody.time_zone = timezone;
+							scheduleRequestBody.schedule_datetime_date = formatScheduleDatetimeUtcIso(scheduledDateTime);
+						} else {
+							const unitOfTimeName = this.getNodeParameter('notifyerUnitOfTime', i) as string;
+							const unitOfTimeRaw = this.getNodeParameter('notifyerUnitOfTimeValue', i) as number | string;
+							const unitOfTimeValue =
+								typeof unitOfTimeRaw === 'number' ? unitOfTimeRaw : Number(unitOfTimeRaw);
+							scheduleRequestBody.unit_of_time_name = unitOfTimeName;
+							scheduleRequestBody.unit_of_time_value = unitOfTimeValue;
+						}
+
+						// Optional: send only if recipient reply matches (API `condition_one`).
+						const replyCondition = this.getNodeParameter('notifyerRecipientReplyCondition', i, '') as string;
+						if (replyCondition && String(replyCondition).trim() !== '') {
+							scheduleRequestBody.condition_one = replyCondition;
+						}
+
+						// Optional: label include/exclude — `c` = status, `v` = label ids (`condition_two`).
+						const labelConditionStatus = this.getNodeParameter('notifyerLabelConditionStatus', i, '') as string;
+						const conditionTwoLabels = this.getNodeParameter('notifyerConditionTwoLabels', i, []) as string[];
+						if (
+							labelConditionStatus &&
+							String(labelConditionStatus).trim() !== '' &&
+							Array.isArray(conditionTwoLabels) &&
+							conditionTwoLabels.length > 0
+						) {
+							scheduleRequestBody.condition_two = {
+								c: labelConditionStatus,
+								v: conditionTwoLabels,
+							};
+						}
 
 						const options: IHttpRequestOptions = {
 							method: 'POST',
 							baseURL: BASE_URLS.NOTIFYER,
-							url: '/n8n/send-message',
+							url: '/n8n/messages/send',
 							headers: {
 								'Content-Type': 'application/json',
 								'Accept': 'application/json',
