@@ -117,7 +117,7 @@ export class WhatsAble implements INodeType {
 			},
 			// Fields for notifier product - Send Message
 			{
-				displayName: 'Recipient',
+				displayName: 'Phone Number',
 				name: 'recipient',
 				type: 'string',
 				placeholder: 'Recipient phone number',
@@ -182,7 +182,7 @@ export class WhatsAble implements INodeType {
 
 			// Fields for notifyer product - Send Template
 			{
-				displayName: 'Recipient',
+				displayName: 'Phone Number',
 				name: 'notifyerRecipient',
 				type: 'string',
 				required: true,
@@ -395,7 +395,8 @@ export class WhatsAble implements INodeType {
 					{ name: 'The Recipient Did Not Reply in 48 Hrs', value: '48h' },
 					{ name: 'The Recipient Did Not Reply in 6 Hrs', value: '6h' },
 					{ name: 'The Recipient Did Not Reply in 72 Hrs', value: '72h' },
-					{ name: 'The Recipient Did Not Reply Since My Last Message', value: '0m' },
+					{ name: 'The Recipient Did Not Reply Since This Last Message', value: '0m' },
+					{ name: 'The Recipient Never Replied to Any Message', value: 'never' },
 				],
 				displayOptions: {
 					show: {
@@ -1720,13 +1721,13 @@ export class WhatsAble implements INodeType {
 							case 'notifyer':
 								if (currentOperation === 'sendWhatsAppMessage') {
 									returnData.push({
-										name: 'Send Template Via Notifyer',
+										name: 'Send Message Template',
 										value: 'sendNotifyerTemplate',
 										description: 'Send template-based WhatsApp messages',
 										action: 'Send template via notifyer',
 									});
 									returnData.push({
-										name: 'Send Non Template Via Notifyer',
+										name: 'Send Non Template Message',
 										value: 'sendNonTemplateMessage',
 										description: 'Send non-template WhatsApp messages',
 										action: 'Send non template via notifyer',
@@ -1739,13 +1740,13 @@ export class WhatsAble implements INodeType {
 									});
 								} else if (currentOperation === 'scheduleWhatsAppMessage') {
 									returnData.push({
-										name: 'Send Template Via Notifyer',
+										name: 'Send Message Template',
 										value: 'sendNotifyerTemplate',
 										description: 'Schedule template-based WhatsApp messages',
 										action: 'Schedule template via notifyer',
 									});
 									returnData.push({
-										name: 'Send Non Template Via Notifyer',
+										name: 'Send Non Template Message',
 										value: 'sendNonTemplateMessage',
 										description: 'Schedule non-template WhatsApp messages',
 										action: 'Schedule non template via notifyer',
