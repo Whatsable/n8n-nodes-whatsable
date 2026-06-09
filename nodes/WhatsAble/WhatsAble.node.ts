@@ -38,6 +38,7 @@ export class WhatsAble implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] || "Configure WhatsApp messaging"}}',
 		description: 'Send & Schedule WhatsApp messages using the official WhatsApp API and have human/AI collaboration',
+		usableAsTool: true,
 		defaults: {
 			name: 'WhatsAble',
 		},
@@ -1559,7 +1560,7 @@ export class WhatsAble implements INodeType {
 				default: '',
 			},
 		],
-	};
+	} as INodeTypeDescription;
 
 	methods = {
 		loadOptions: {
