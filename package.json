@@ -59,7 +59,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.1",
     "gulp": "^4.0.2",
-    "n8n": "^1.89.2",
+    "n8n": "^2.25.6",
     "nodemon": "^3.1.10",
     "prettier": "^3.3.2",
     "typescript": "^5.5.3",
@@ -70,5 +70,10 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "pnpm": {
+    "overrides": {
+      "@langchain/core": "1.1.48"
+    }
   }
 }
