@@ -73,6 +73,11 @@ export class WhatsAbleTrigger implements INodeType {
                 type: 'options',
                 options: [
                     {
+                        name: 'Notifyer System Incoming Message',
+                        value: 'notifyer',
+                        description: 'Use Notifyer System API for incoming messages',
+                    },
+                    {
                         name: 'WhatsAble Incoming Message',
                         value: 'whatsableTrigger',
                         description: 'Use WhatsAble Trigger API for incoming messages',
@@ -83,17 +88,12 @@ export class WhatsAbleTrigger implements INodeType {
                         description: 'Use Notifier API for incoming messages',
                     },
                     {
-                        name: 'Notifyer System Incoming Message',
-                        value: 'notifyer',
-                        description: 'Use Notifyer System API for incoming messages',
-                    },
-                    {
                         name: 'Notifyer System Incoming & Outgoing Message',
                         value: 'notifyerSystemAll',
                         description: 'Use Notifyer System API for incoming & Outgoing messages',
                     }
                 ],
-                default: 'whatsableTrigger',
+                default: 'notifyer',
                 description: 'Choose which WhatsAble API to use for this trigger',
             },
             {
