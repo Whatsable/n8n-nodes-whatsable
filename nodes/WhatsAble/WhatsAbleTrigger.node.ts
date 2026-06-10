@@ -13,7 +13,7 @@ export class WhatsAbleTrigger implements INodeType {
         group: ['trigger'],
         version: 1,
         subtitle: 'Incoming/outgoing WhatsApp message',
-        description: 'Triggers when receiving messages from WhatsAble services',
+        description: 'Triggers when receiving messages from WhatsAble services. Incoming audio messages are automatically transcribed to text.',
         defaults: {
             name: 'WhatsAble Trigger',
         },
@@ -67,6 +67,12 @@ export class WhatsAbleTrigger implements INodeType {
             },
         ],
         properties: [
+            {
+                displayName: 'Incoming audio messages are automatically transcribed to text and included in the webhook payload.',
+                name: 'audioTranscriptionNotice',
+                type: 'notice',
+                default: '',
+            },
             {
                 displayName: 'Credential Type',
                 name: 'credentialType',
