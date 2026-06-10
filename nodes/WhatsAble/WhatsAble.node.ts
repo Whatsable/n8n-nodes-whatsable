@@ -94,6 +94,12 @@ export class WhatsAble implements INodeType {
 						description: 'Send WhatsApp messages to a group',
 						action: 'Send whatsapp message to a group',
 					},
+					{
+						name: 'Manage Contact',
+						value: 'manageContact',
+						description: 'Update contact details such as notes and labels',
+						action: 'Manage contact',
+					},
 				],
 				default: 'sendWhatsAppMessage',
 				required: true,
@@ -106,7 +112,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage', 'sendWhatsAppMessageToGroup'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage', 'sendWhatsAppMessageToGroup', 'manageContact'],
 					},
 				},
 				typeOptions: {
@@ -892,7 +898,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'manageContact'],
 						productOperation: ['updateContact'],
 					},
 				},
@@ -907,7 +913,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'manageContact'],
 						productOperation: ['updateContact'],
 					},
 				},
@@ -924,7 +930,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'manageContact'],
 						productOperation: ['updateContact'],
 					},
 				},
@@ -941,7 +947,7 @@ export class WhatsAble implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
+						operation: ['sendWhatsAppMessage', 'manageContact'],
 						productOperation: ['updateContact'],
 					},
 				},
@@ -1765,6 +1771,13 @@ export class WhatsAble implements INodeType {
 										description: 'Schedule non-template WhatsApp messages',
 										action: 'Schedule non template via notifyer',
 									});
+								} else if (currentOperation === 'manageContact') {
+									returnData.push({
+										name: 'Update Contact',
+										value: 'updateContact',
+										description: 'Update contact details',
+										action: 'Update contact',
+									});
 								}
 								break;
 							default:
@@ -2521,6 +2534,55 @@ export class WhatsAble implements INodeType {
 						);
 					} else {
 						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported`);
+					}
+				} else if (operation === 'manageContact') {
+					const productOperation = this.getNodeParameter('productOperation', i) as string;
+
+					if (productOperation === 'updateContact') {
+						const phoneNumber = this.getNodeParameter('updateContactPhoneNumber', i) as string;
+						const note = this.getNodeParameter('updateContactNote', i, '') as string;
+						const labels = this.getNodeParameter('updateContactLabels', i, []) as string[];
+						const selectedRemoveLabels = this.getNodeParameter('selectRemoveLabels', i, []) as string[];
+
+						const requestBody: Record<string, any> = {
+							phone_number: phoneNumber,
+						};
+
+						if (note) {
+							requestBody.note = note;
+						}
+
+						if (!labels || labels.length === 0) {
+							requestBody.labels = [];
+						} else if (labels.includes('__REMOVE_ALL__')) {
+							requestBody.labels = ['__REMOVE_ALL__'];
+						} else {
+							requestBody.labels = labels.filter((label: string) => label !== '__REMOVE_ALL__');
+						}
+
+						requestBody.selected_labels = selectedRemoveLabels && selectedRemoveLabels.length > 0
+							? selectedRemoveLabels
+							: [];
+
+						const options: IHttpRequestOptions = {
+							method: 'PUT',
+							baseURL: BASE_URLS.NOTIFYER,
+							url: '/n8n/recipient/details/update',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json',
+							},
+							body: requestBody,
+							returnFullResponse: true,
+						};
+
+						response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'whatsAbleApi',
+							options,
+						);
+					} else {
+						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported for Manage Contact`);
 					}
 				} else if (operation === 'scheduleWhatsAppMessage') {
 					// Handle scheduled WhatsApp message operation
