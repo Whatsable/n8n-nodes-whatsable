@@ -31,7 +31,7 @@ function formatScheduleDatetimeUtcIso(isoLike: string): string {
 
 export class WhatsAble implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'WhatsAble',
+		displayName: 'WhatsAble for WhatsApp',
 		name: 'whatsAble',
 		icon: 'file:whatsable.svg',
 		group: ['output'],
