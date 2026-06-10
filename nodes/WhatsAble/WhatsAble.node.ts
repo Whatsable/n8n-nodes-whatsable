@@ -29,6 +29,20 @@ function formatScheduleDatetimeUtcIso(isoLike: string): string {
 	return new Date(isoLike).toISOString().replace(/\.\d{3}Z$/, 'Z');
 }
 
+function buildUpdateContactLabelsPayload(
+	labels: string[],
+	selectedRemoveLabels: string[],
+): { labels: string[]; selected_labels: string[] } {
+	if (selectedRemoveLabels.includes('__REMOVE_ALL__')) {
+		return { labels: [], selected_labels: ['__REMOVE_ALL__'] };
+	}
+
+	return {
+		labels: labels.length > 0 ? labels : [],
+		selected_labels: selectedRemoveLabels.length > 0 ? selectedRemoveLabels : [],
+	};
+}
+
 export class WhatsAble implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'WhatsAble for WhatsApp',
@@ -923,7 +937,7 @@ export class WhatsAble implements INodeType {
 				},
 			},
 			{
-				displayName: 'Add or Remove Labels',
+				displayName: 'Add Label Names or IDs',
 				name: 'updateContactLabels',
 				type: 'multiOptions',
 				default: [],
@@ -936,11 +950,11 @@ export class WhatsAble implements INodeType {
 				},
 				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
-					loadOptionsMethod: 'getLabelsForUpdateContact',
+					loadOptionsMethod: 'getLabels',
 				},
 			},
 			{
-				displayName: 'Select Labels to Remove',
+				displayName: 'Remove Label Names or IDs',
 				name: 'selectRemoveLabels',
 				type: 'multiOptions',
 				default: [],
@@ -953,7 +967,7 @@ export class WhatsAble implements INodeType {
 				},
 				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 				typeOptions: {
-					loadOptionsMethod: 'getLabels',
+					loadOptionsMethod: 'getLabelsForRemoveContact',
 				},
 			},
 
@@ -1856,10 +1870,9 @@ export class WhatsAble implements INodeType {
 				return returnData;
 			},
 
-			async getLabelsForUpdateContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+			async getLabelsForRemoveContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 
-				// Add "Remove All" option first
 				returnData.push({
 					name: 'Remove All',
 					value: '__REMOVE_ALL__',
@@ -1867,7 +1880,6 @@ export class WhatsAble implements INodeType {
 				});
 
 				try {
-					// Get labels
 					const labelsOptions: IHttpRequestOptions = {
 						method: 'GET',
 						baseURL: BASE_URLS.NOTIFYER,
@@ -1883,7 +1895,6 @@ export class WhatsAble implements INodeType {
 						labelsOptions,
 					);
 
-					// Process labels from response
 					if (Array.isArray(response)) {
 						for (const label of response) {
 							if (label.label) {
@@ -2475,17 +2486,10 @@ export class WhatsAble implements INodeType {
 							requestBody.note = note;
 						}
 
-						if (!labels || labels.length === 0) {
-							requestBody.labels = [];
-						} else if (labels.includes('__REMOVE_ALL__')) {
-							requestBody.labels = ['__REMOVE_ALL__'];
-						} else {
-							requestBody.labels = labels.filter((label: string) => label !== '__REMOVE_ALL__');
-						}
-
-						requestBody.selected_labels = selectedRemoveLabels && selectedRemoveLabels.length > 0 
-							? selectedRemoveLabels 
-							: [];
+						Object.assign(
+							requestBody,
+							buildUpdateContactLabelsPayload(labels, selectedRemoveLabels),
+						);
 
 						const options: IHttpRequestOptions = {
 							method: 'PUT',
@@ -2552,17 +2556,10 @@ export class WhatsAble implements INodeType {
 							requestBody.note = note;
 						}
 
-						if (!labels || labels.length === 0) {
-							requestBody.labels = [];
-						} else if (labels.includes('__REMOVE_ALL__')) {
-							requestBody.labels = ['__REMOVE_ALL__'];
-						} else {
-							requestBody.labels = labels.filter((label: string) => label !== '__REMOVE_ALL__');
-						}
-
-						requestBody.selected_labels = selectedRemoveLabels && selectedRemoveLabels.length > 0
-							? selectedRemoveLabels
-							: [];
+						Object.assign(
+							requestBody,
+							buildUpdateContactLabelsPayload(labels, selectedRemoveLabels),
+						);
 
 						const options: IHttpRequestOptions = {
 							method: 'PUT',
