@@ -198,6 +198,19 @@ export class WhatsAble implements INodeType {
 				default: '',
 			},
 			{
+				displayName: 'The first time you select a template, n8n may switch this field to Expression mode. If that happens, click Fixed to return to the dropdown and choose your template.',
+				name: 'notifyerTemplateModeNotice',
+				type: 'notice',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate'],
+					},
+				},
+			},
+			{
 				displayName: 'Template Name or ID',
 				name: 'notifyerTemplate',
 				type: 'options',
