@@ -397,7 +397,7 @@ export class WhatsAble implements INodeType {
 					{ name: 'The Recipient Did Not Reply in 6 Hrs', value: '6h' },
 					{ name: 'The Recipient Did Not Reply in 72 Hrs', value: '72h' },
 					{ name: 'The Recipient Did Not Reply Since This Last Message', value: '0m' },
-					{ name: 'The Recipient Never Replied to Any Message', value: 'never' },
+					{ name: 'The Recipient Never Replied to Any Message (Recommended)', value: 'never' },
 				],
 				displayOptions: {
 					show: {
