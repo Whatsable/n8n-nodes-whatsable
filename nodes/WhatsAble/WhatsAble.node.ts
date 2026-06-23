@@ -419,18 +419,59 @@ export class WhatsAble implements INodeType {
 				name: 'notifyerRecipientReplyCondition',
 				type: 'options',
 				default: '',
+				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
 				options: [
 					{ name: '', value: '' },
-					{ name: 'The Recipient Did Not Reply in 12 Hrs', value: '12h' },
-					{ name: 'The Recipient Did Not Reply in 20 Mins', value: '20m' },
-					{ name: 'The Recipient Did Not Reply in 24 Hrs', value: '24h' },
-					{ name: 'The Recipient Did Not Reply in 3 Hrs', value: '3h' },
-					{ name: 'The Recipient Did Not Reply in 45 Mins', value: '45m' },
-					{ name: 'The Recipient Did Not Reply in 48 Hrs', value: '48h' },
-					{ name: 'The Recipient Did Not Reply in 6 Hrs', value: '6h' },
-					{ name: 'The Recipient Did Not Reply in 72 Hrs', value: '72h' },
-					{ name: 'The Recipient Did Not Reply Since This Last Message', value: '0m' },
-					{ name: 'The Recipient Never Replied to Any Message (Recommended)', value: 'never' },
+					{
+						name: 'Recipient Did Not Reply Within 20 Minutes After My Last Message',
+						value: '20m',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 20 minutes after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 45 Minutes After My Last Message',
+						value: '45m',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 45 minutes after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 3 Hours After My Last Message',
+						value: '3h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 3 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 6 Hours After My Last Message',
+						value: '6h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 6 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 12 Hours After My Last Message',
+						value: '12h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 12 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 24 Hours After My Last Message',
+						value: '24h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 24 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 48 Hours After My Last Message',
+						value: '48h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 48 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 72 Hours After My Last Message',
+						value: '72h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 72 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply After My Last Message',
+						value: 'never',
+						description: 'Send the scheduled message at the schedule time only if the recipient has not replied since my most recent message',
+					},
+					{
+						name: 'Recipient Never Replied to Any of My Messages',
+						value: 'never-replied',
+						description: 'Send the scheduled message at the schedule time only if the recipient has never replied to any of my messages',
+					},
 				],
 				displayOptions: {
 					show: {

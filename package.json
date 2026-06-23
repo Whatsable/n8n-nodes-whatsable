@@ -25,8 +25,9 @@
   "packageManager": "pnpm@9.1.4",
   "main": "index.js",
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "tsc && gulp build:icons",
-    "dev": "nodemon -w nodes -w credentials --ext ts --exec \"tsc && n8n\"",
+    "dev": "nodemon -w nodes -w credentials --ext ts,json,svg,png --exec \"pnpm build && n8n\"",
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
