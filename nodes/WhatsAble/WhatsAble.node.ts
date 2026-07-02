@@ -423,6 +423,11 @@ export class WhatsAble implements INodeType {
 				options: [
 					{ name: '', value: '' },
 					{
+						name: 'Recipient Did Not Reply After My Last Message',
+						value: 'never',
+						description: 'Send the scheduled message at the schedule time only if the recipient has not replied since my most recent message',
+					},
+					{
 						name: 'Recipient Did Not Reply Within 20 Minutes After My Last Message',
 						value: '20m',
 						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 20 minutes after my last message',
@@ -461,11 +466,6 @@ export class WhatsAble implements INodeType {
 						name: 'Recipient Did Not Reply Within 72 Hours After My Last Message',
 						value: '72h',
 						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 72 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply After My Last Message',
-						value: 'never',
-						description: 'Send the scheduled message at the schedule time only if the recipient has not replied since my most recent message',
 					},
 					{
 						name: 'Recipient Never Replied to Any of My Messages',
