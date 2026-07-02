@@ -22,10 +22,15 @@ const BASE_URLS = {
 } as const;
 
 /**
- * Notifyer scheduled-template API expects `schedule_datetime_date` as UTC ISO without milliseconds.
- * Parses a datetime string (from the UI) and returns `YYYY-MM-DDTHH:mm:ssZ`.
+ * Notifyer scheduled API expects `schedule_datetime_date` as UTC ISO without milliseconds.
+ * Sends the picker datetime as-is (wall clock) with a Z suffix; backend converts using `time_zone`.
  */
 function formatScheduleDatetimeUtcIso(isoLike: string): string {
+	const normalized = isoLike.trim().replace(' ', 'T');
+	const match = normalized.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
+	if (match) {
+		return `${match[1]}Z`;
+	}
 	return new Date(isoLike).toISOString().replace(/\.\d{3}Z$/, 'Z');
 }
 
@@ -316,313 +321,6 @@ export class WhatsAble implements INodeType {
 				},
 			},
 
-			{
-				displayName: 'Schedule Type : Relative or Specific',
-				name: 'notifyerScheduleTypeSpecific',
-				type: 'boolean',
-				default: false,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-					},
-				},
-				description: 'Whether to schedule at a specific date and time (on) or after a relative delay from now (off)',
-			},
-			{
-				displayName: 'Unit of Time',
-				name: 'notifyerUnitOfTime',
-				type: 'options',
-				required: true,
-				options: [
-					{ name: '', value: '' },
-					{ name: 'Days', value: 'days' },
-					{ name: 'Hours', value: 'hours' },
-					{ name: 'Minutes', value: 'min' },
-				],
-				default: '',
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-						notifyerScheduleTypeSpecific: [false],
-					},
-				},
-			},
-			{
-				displayName: 'Number',
-				name: 'notifyerUnitOfTimeValue',
-				type: 'options',
-				required: true,
-				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items -- numeric ascending order for UX
-				options: [
-					{ name: '', value: '' },
-					{ name: '1', value: 1 },
-					{ name: '2', value: 2 },
-					{ name: '3', value: 3 },
-					{ name: '4', value: 4 },
-					{ name: '5', value: 5 },
-					{ name: '10', value: 10 },
-					{ name: '15', value: 15 },
-					{ name: '20', value: 20 },
-					{ name: '30', value: 30 },
-					{ name: '60', value: 60 },
-					{ name: '90', value: 90 },
-					{ name: '120', value: 120 },
-				],
-				default: '',
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-						notifyerScheduleTypeSpecific: [false],
-					},
-				},
-			},
-
-			{
-				displayName: 'Scheduled Date and Time',
-				name: 'templateScheduledDateTime',
-				type: 'dateTime',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-						notifyerScheduleTypeSpecific: [true],
-					},
-				},
-				default: '',
-			},
-			{
-				displayName: 'Timezone',
-				name: 'templateTimezone',
-				type: 'options',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-						notifyerScheduleTypeSpecific: [true],
-					},
-				},
-				options: WHATSAPP_TIMEZONES,
-				default: '',
-			},
-			{
-				displayName: 'Recipient Reply Status : Send Only If',
-				name: 'notifyerRecipientReplyCondition',
-				type: 'options',
-				default: '',
-				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
-				options: [
-					{ name: '', value: '' },
-					{
-						name: 'Recipient Did Not Reply After My Last Message',
-						value: 'never',
-						description: 'Send the scheduled message at the schedule time only if the recipient has not replied since my most recent message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 20 Minutes After My Last Message',
-						value: '20m',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 20 minutes after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 45 Minutes After My Last Message',
-						value: '45m',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 45 minutes after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 3 Hours After My Last Message',
-						value: '3h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 3 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 6 Hours After My Last Message',
-						value: '6h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 6 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 12 Hours After My Last Message',
-						value: '12h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 12 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 24 Hours After My Last Message',
-						value: '24h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 24 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 48 Hours After My Last Message',
-						value: '48h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 48 hours after my last message',
-					},
-					{
-						name: 'Recipient Did Not Reply Within 72 Hours After My Last Message',
-						value: '72h',
-						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 72 hours after my last message',
-					},
-					{
-						name: 'Recipient Never Replied to Any of My Messages',
-						value: 'never-replied',
-						description: 'Send the scheduled message at the schedule time only if the recipient has never replied to any of my messages',
-					},
-				],
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-					},
-				},
-				description: 'Optional: add to the request only when a value is selected',
-			},
-			{
-				displayName: 'Label Status : Include or Exclude',
-				name: 'notifyerLabelConditionStatus',
-				type: 'options',
-				default: '',
-				options: [
-					{ name: '', value: '' },
-					{ name: 'Include', value: 'include' },
-					{ name: 'Does Not Include', value: 'not' },
-				],
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-					},
-				},
-				description: 'How selected labels apply to the condition (used with Labels below)',
-			},
-			{
-				displayName: 'Label Names or IDs',
-				name: 'notifyerConditionTwoLabels',
-				type: 'multiOptions',
-				default: [],
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNotifyerTemplate'],
-					},
-				},
-				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
-				typeOptions: {
-					loadOptionsMethod: 'getLabels',
-				},
-			},
-
-			// Fields for whatsable product
-			{
-				displayName: 'Recipient Name or ID',
-				name: 'whatsableTo',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getWhatsAppNumbers',
-				},
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
-						productOperation: ['sendWhatsableMessage'],
-					},
-				},
-				description: 'Select a WhatsApp number to send from. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-				default: '',
-			},
-			{
-				displayName: 'Text',
-				name: 'whatsableText',
-				type: 'string',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
-						productOperation: ['sendWhatsableMessage'],
-					},
-				},
-				description: 'Message text content',
-				typeOptions: {
-					rows: 4,
-				},
-				default: '',
-			},
-			{
-				displayName: 'Attachment URL',
-				name: 'whatsableAttachment',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
-						productOperation: ['sendWhatsableMessage'],
-					},
-				},
-				description: 'URL of an attachment to send',
-				default: '',
-			},
-			{
-				displayName: 'Filename',
-				name: 'whatsableFilename',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessage'],
-						productOperation: ['sendWhatsableMessage'],
-					},
-				},
-				description: 'Filename for the attachment',
-				default: '',
-			},
-
-			// Fields for whatsable product - Send Group Message
-			{
-				displayName: 'Group Name or ID',
-				name: 'whatsableGroup',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getGroups',
-				},
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessageToGroup'],
-						productOperation: ['sendWhatsableGroupMessage'],
-					},
-				},
-				description: 'Select a group to send message to. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-				default: '',
-			},
-			{
-				displayName: 'Message',
-				name: 'whatsableGroupMessage',
-				type: 'string',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['sendWhatsAppMessageToGroup'],
-						productOperation: ['sendWhatsableGroupMessage'],
-					},
-				},
-				description: 'Message text content',
-				typeOptions: {
-					rows: 4,
-				},
-				default: '',
-			},
-
 			// Fields for notifyer product - Send Non Template Message
 			{
 				displayName: 'Recipient Phone Number',
@@ -909,36 +607,329 @@ export class WhatsAble implements INodeType {
 					loadOptionsMethod: 'getLabels',
 				},
 			},
+			{
+				displayName: 'Note',
+				name: 'nonTemplateNote',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage', 'scheduleWhatsAppMessage'],
+						productOperation: ['sendNonTemplateMessage'],
+					},
+				},
+				description: 'Optional note to add to the message',
+				typeOptions: {
+					rows: 2,
+				},
+			},
+
+			{
+				displayName: 'Schedule Type : Relative or Specific',
+				name: 'notifyerScheduleTypeSpecific',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+					},
+				},
+				description: 'Whether to schedule at a specific date and time (on) or after a relative delay from now (off)',
+			},
+			{
+				displayName: 'Unit of Time',
+				name: 'notifyerUnitOfTime',
+				type: 'options',
+				required: true,
+				options: [
+					{ name: '', value: '' },
+					{ name: 'Days', value: 'days' },
+					{ name: 'Hours', value: 'hours' },
+					{ name: 'Minutes', value: 'min' },
+				],
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+						notifyerScheduleTypeSpecific: [false],
+					},
+				},
+			},
+			{
+				displayName: 'Number',
+				name: 'notifyerUnitOfTimeValue',
+				type: 'options',
+				required: true,
+				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items -- numeric ascending order for UX
+				options: [
+					{ name: '', value: '' },
+					{ name: '1', value: 1 },
+					{ name: '2', value: 2 },
+					{ name: '3', value: 3 },
+					{ name: '4', value: 4 },
+					{ name: '5', value: 5 },
+					{ name: '10', value: 10 },
+					{ name: '15', value: 15 },
+					{ name: '20', value: 20 },
+					{ name: '30', value: 30 },
+					{ name: '60', value: 60 },
+					{ name: '90', value: 90 },
+					{ name: '120', value: 120 },
+				],
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+						notifyerScheduleTypeSpecific: [false],
+					},
+				},
+			},
 
 			{
 				displayName: 'Scheduled Date and Time',
-				name: 'nonTemplateScheduledDateTime',
+				name: 'templateScheduledDateTime',
 				type: 'dateTime',
 				required: true,
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNonTemplateMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+						notifyerScheduleTypeSpecific: [true],
 					},
 				},
-				description: 'The date and time when the message should be sent',
 				default: '',
 			},
 			{
 				displayName: 'Timezone',
-				name: 'nonTemplateTimezone',
+				name: 'templateTimezone',
 				type: 'options',
+				required: true,
 				displayOptions: {
 					show: {
 						resource: ['sendMessage'],
 						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNonTemplateMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+						notifyerScheduleTypeSpecific: [true],
 					},
 				},
 				options: WHATSAPP_TIMEZONES,
 				default: '',
-				description: 'Timezone for the scheduled date and time',
+			},
+			{
+				displayName: 'Recipient Reply Status : Send Only If',
+				name: 'notifyerRecipientReplyCondition',
+				type: 'options',
+				default: '',
+				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
+				options: [
+					{ name: '', value: '' },
+					{
+						name: 'Recipient Did Not Reply After My Last Message',
+						value: 'never',
+						description: 'Send the scheduled message at the schedule time only if the recipient has not replied since my most recent message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 20 Minutes After My Last Message',
+						value: '20m',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 20 minutes after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 45 Minutes After My Last Message',
+						value: '45m',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 45 minutes after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 3 Hours After My Last Message',
+						value: '3h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 3 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 6 Hours After My Last Message',
+						value: '6h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 6 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 12 Hours After My Last Message',
+						value: '12h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 12 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 24 Hours After My Last Message',
+						value: '24h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 24 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 48 Hours After My Last Message',
+						value: '48h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 48 hours after my last message',
+					},
+					{
+						name: 'Recipient Did Not Reply Within 72 Hours After My Last Message',
+						value: '72h',
+						description: 'Send the scheduled message at the schedule time only if the recipient did not reply within 72 hours after my last message',
+					},
+					{
+						name: 'Recipient Never Replied to Any of My Messages',
+						value: 'never-replied',
+						description: 'Send the scheduled message at the schedule time only if the recipient has never replied to any of my messages',
+					},
+				],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+					},
+				},
+				description: 'Optional: add to the request only when a value is selected',
+			},
+			{
+				displayName: 'Label Status : Include or Exclude',
+				name: 'notifyerLabelConditionStatus',
+				type: 'options',
+				default: '',
+				options: [
+					{ name: '', value: '' },
+					{ name: 'Include', value: 'include' },
+					{ name: 'Does Not Include', value: 'not' },
+				],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+					},
+				},
+				description: 'How selected labels apply to the condition (used with Labels below)',
+			},
+			{
+				displayName: 'Label Names or IDs',
+				name: 'notifyerConditionTwoLabels',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['scheduleWhatsAppMessage'],
+						productOperation: ['sendNotifyerTemplate', 'sendNonTemplateMessage'],
+					},
+				},
+				description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+				typeOptions: {
+					loadOptionsMethod: 'getLabels',
+				},
+			},
+
+			// Fields for whatsable product
+			{
+				displayName: 'Recipient Name or ID',
+				name: 'whatsableTo',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getWhatsAppNumbers',
+				},
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['sendWhatsableMessage'],
+					},
+				},
+				description: 'Select a WhatsApp number to send from. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				default: '',
+			},
+			{
+				displayName: 'Text',
+				name: 'whatsableText',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['sendWhatsableMessage'],
+					},
+				},
+				description: 'Message text content',
+				typeOptions: {
+					rows: 4,
+				},
+				default: '',
+			},
+			{
+				displayName: 'Attachment URL',
+				name: 'whatsableAttachment',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['sendWhatsableMessage'],
+					},
+				},
+				description: 'URL of an attachment to send',
+				default: '',
+			},
+			{
+				displayName: 'Filename',
+				name: 'whatsableFilename',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessage'],
+						productOperation: ['sendWhatsableMessage'],
+					},
+				},
+				description: 'Filename for the attachment',
+				default: '',
+			},
+
+			// Fields for whatsable product - Send Group Message
+			{
+				displayName: 'Group Name or ID',
+				name: 'whatsableGroup',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getGroups',
+				},
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessageToGroup'],
+						productOperation: ['sendWhatsableGroupMessage'],
+					},
+				},
+				description: 'Select a group to send message to. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				default: '',
+			},
+			{
+				displayName: 'Message',
+				name: 'whatsableGroupMessage',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['sendMessage'],
+						operation: ['sendWhatsAppMessageToGroup'],
+						productOperation: ['sendWhatsableGroupMessage'],
+					},
+				},
+				description: 'Message text content',
+				typeOptions: {
+					rows: 4,
+				},
+				default: '',
 			},
 
 			// Fields for notifyer product - Update Contact
@@ -1012,613 +1003,6 @@ export class WhatsAble implements INodeType {
 				},
 			},
 
-			// Condition fields for scheduled messages
-			{
-				displayName: 'Enable Conditions',
-				name: 'enableConditions',
-				type: 'boolean',
-				default: false,
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNonTemplateMessage'],
-					},
-				},
-				description: 'Whether to enable conditions to control when the scheduled message should be sent',
-			},
-			{
-				displayName: 'Scheduled Message Rules (Conversation-Based)',
-				name: 'conditions',
-				type: 'fixedCollection',
-				default: { values: [{}] },
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNonTemplateMessage'],
-						enableConditions: [true],
-					},
-				},
-				description: 'Set conditions to automatically send follow-up messages only when specific criteria are met. The system checks these conditions right before sending to ensure messages are relevant and timely.',
-				typeOptions: {
-					multipleValues: true,
-					multipleValueButtonText: 'Add Condition',
-				},
-				options: [
-					{
-						displayName: 'Condition',
-						name: 'values',
-						values: [
-							{
-								displayName: 'Field',
-								name: 'field',
-								type: 'options',
-								default: 'system_user_last_message_time',
-								options: [
-									{
-										name: 'Bot Last Message Time',
-										value: 'system_user_last_message_time',
-									},
-									{
-										name: 'Conversation Paragraph',
-										value: 'convo_para',
-									},
-									{
-										name: 'If Person Did Not Reply Anything',
-										value: 'no_reply',
-									},
-									{
-										name: 'If Person Did Not Send Any Message In The Last 24h',
-										value: 'no_msg_24h',
-									},
-									{
-										name: 'If Person Replied',
-										value: 'person_replied',
-									},
-									{
-										name: 'Last Message Of Bot',
-										value: 'system_user_last_message',
-									},
-									{
-										name: 'Last Message Of User',
-										value: 'recipient_last_message',
-									},
-									{
-										name: 'Phone Number',
-										value: 'phone_number',
-									},
-									{
-										name: 'User Last Message Time',
-										value: 'user_last_message_time',
-									},
-								],
-								description: 'Select the field to evaluate',
-							},
-							{
-								displayName: 'Operator',
-								name: 'operator',
-								type: 'options',
-								default: 'text:equal',
-								options: [
-									{
-										name: 'Array : Contains',
-										value: 'array:contains',
-									},
-									{
-										name: 'Array : Contains (Ignore Case)',
-										value: 'array:contains:ci',
-									},
-									{
-										name: 'Array : Length Equals',
-										value: 'array:lengthequal',
-									},
-									{
-										name: 'Array : Length Greater Than',
-										value: 'array:lengthgreater',
-									},
-									{
-										name: 'Array : Length Greater Than or Equal',
-										value: 'array:lengthgreaterequal',
-									},
-									{
-										name: 'Array : Length Less Than',
-										value: 'array:lengthless',
-									},
-									{
-										name: 'Array : Length Less Than or Equal',
-										value: 'array:lengthlessequal',
-									},
-									{
-										name: 'Array : Length Not Equals',
-										value: 'array:lengthnotequal',
-									},
-									{
-										name: 'Array : Not Contains',
-										value: 'array:notcontains',
-									},
-									{
-										name: 'Array : Not Contains (Ignore Case)',
-										value: 'array:notcontains:ci',
-									},
-									{
-										name: 'Boolean : Equals',
-										value: 'boolean:equal',
-									},
-									{
-										name: 'Boolean : Not Equals',
-										value: 'boolean:notequal',
-									},
-									{
-										name: 'DateTime : Earlier Than',
-										value: 'datetime:earlier',
-									},
-									{
-										name: 'DateTime : Earlier Than or Equal',
-										value: 'datetime:earlierequal',
-									},
-									{
-										name: 'DateTime : Equals',
-										value: 'datetime:equal',
-									},
-									{
-										name: 'DateTime : Later Than',
-										value: 'datetime:later',
-									},
-									{
-										name: 'DateTime : Later Than or Equal',
-										value: 'datetime:laterequal',
-									},
-									{
-										name: 'DateTime : Not Equals',
-										value: 'datetime:notequal',
-									},
-									{
-										name: 'Exists',
-										value: 'basic:exists',
-									},
-									{
-										name: 'Not Exists',
-										value: 'basic:notexists',
-									},
-									{
-										name: 'Numeric : Equals',
-										value: 'numeric:equal',
-									},
-									{
-										name: 'Numeric : Greater Than',
-										value: 'numeric:greater',
-									},
-									{
-										name: 'Numeric : Greater Than or Equal',
-										value: 'numeric:greaterequal',
-									},
-									{
-										name: 'Numeric : Less Than',
-										value: 'numeric:less',
-									},
-									{
-										name: 'Numeric : Less Than or Equal',
-										value: 'numeric:lessequal',
-									},
-									{
-										name: 'Numeric : Not Equals',
-										value: 'numeric:notequal',
-									},
-									{
-										name: 'Text : Contains',
-										value: 'text:contain',
-									},
-									{
-										name: 'Text : Contains (Ignore Case)',
-										value: 'text:contain:ci',
-									},
-									{
-										name: 'Text : Does Not Contain',
-										value: 'text:notcontain',
-									},
-									{
-										name: 'Text : Ends With',
-										value: 'text:endwith',
-									},
-									{
-										name: 'Text : Ends With (Ignore Case)',
-										value: 'text:endwith:ci',
-									},
-									{
-										name: 'Text : Equals',
-										value: 'text:equal',
-									},
-									{
-										name: 'Text : Equals (Ignore Case)',
-										value: 'text:equal:ci',
-									},
-									{
-										name: 'Text : Matches Pattern',
-										value: 'text:matchpattern',
-									},
-									{
-										name: 'Text : Matches Pattern (Ignore Case)',
-										value: 'text:matchpattern:ci',
-									},
-									{
-										name: 'Text : Not Ends With',
-										value: 'text:notendwith',
-									},
-									{
-										name: 'Text : Not Ends With (Ignore Case)',
-										value: 'text:notendwith:ci',
-									},
-									{
-										name: 'Text : Not Equals',
-										value: 'text:notequal',
-									},
-									{
-										name: 'Text : Not Equals (Ignore Case)',
-										value: 'text:notequal:ci',
-									},
-									{
-										name: 'Text : Not Matches Pattern',
-										value: 'text:notmatchpattern',
-									},
-									{
-										name: 'Text : Not Matches Pattern (Ignore Case)',
-										value: 'text:notmatchpattern:ci',
-									},
-									{
-										name: 'Text : Not Starts With',
-										value: 'text:notstartwith',
-									},
-									{
-										name: 'Text : Not Starts With (Ignore Case)',
-										value: 'text:notstartwith:ci',
-									},
-									{
-										name: 'Text : Starts With',
-										value: 'text:startwith',
-									},
-									{
-										name: 'Text : Starts With (Ignore Case)',
-										value: 'text:startwith:ci',
-									},
-									{
-										name: 'Time : Equals',
-										value: 'time:equal',
-									},
-									{
-										name: 'Time : Greater Than',
-										value: 'time:greater',
-									},
-									{
-										name: 'Time : Greater Than or Equal',
-										value: 'time:greaterequal',
-									},
-									{
-										name: 'Time : Less Than',
-										value: 'time:less',
-									},
-									{
-										name: 'Time : Less Than or Equal',
-										value: 'time:lessequal',
-									},
-									{
-										name: 'Time : Not Equals',
-										value: 'time:notequal',
-									},
-								],
-								description: 'Select the comparison operator',
-							},
-							{
-								displayName: 'Value',
-								name: 'value',
-								type: 'string',
-								default: '',
-								displayOptions: {
-									hide: {
-										operator: ['basic:exists', 'basic:notexists'],
-									},
-								},
-								description: 'Enter the value to compare against',
-								placeholder: 'Enter comparison value',
-							},
-							{
-								displayName: 'Operator Type',
-								name: 'operatorType',
-								type: 'options',
-								default: 'AND',
-								options: [
-									{
-										name: 'AND',
-										value: 'AND',
-									},
-									{
-										name: 'OR',
-										value: 'OR',
-									},
-								],
-								description: 'Logical operator to combine with the next condition',
-							},
-						],
-					},
-				],
-			},
-			{
-				displayName: 'Scheduled Message Rules (Integration-Based)',
-				name: 'conditions2',
-				type: 'fixedCollection',
-				default: { values: [{}] },
-				displayOptions: {
-					show: {
-						resource: ['sendMessage'],
-						operation: ['scheduleWhatsAppMessage'],
-						productOperation: ['sendNonTemplateMessage'],
-						enableConditions: [true],
-					},
-				},
-				description: 'Define integration-based conditions for message scheduling',
-				typeOptions: {
-					multipleValues: true,
-					multipleValueButtonText: 'Add Condition',
-				},
-				options: [
-					{
-						displayName: 'Condition',
-						name: 'values',
-						values: [
-							{
-								displayName: 'Field',
-								name: 'field',
-								type: 'string',
-								default: '',
-								description: 'Enter the field name to evaluate',
-							},
-							{
-								displayName: 'Operator',
-								name: 'operator',
-								type: 'options',
-								default: 'text:equal',
-								options: [
-									{
-										name: 'Array : Contains',
-										value: 'array:contains',
-									},
-									{
-										name: 'Array : Contains (Ignore Case)',
-										value: 'array:contains:ci',
-									},
-									{
-										name: 'Array : Length Equals',
-										value: 'array:lengthequal',
-									},
-									{
-										name: 'Array : Length Greater Than',
-										value: 'array:lengthgreater',
-									},
-									{
-										name: 'Array : Length Greater Than or Equal',
-										value: 'array:lengthgreaterequal',
-									},
-									{
-										name: 'Array : Length Less Than',
-										value: 'array:lengthless',
-									},
-									{
-										name: 'Array : Length Less Than or Equal',
-										value: 'array:lengthlessequal',
-									},
-									{
-										name: 'Array : Length Not Equals',
-										value: 'array:lengthnotequal',
-									},
-									{
-										name: 'Array : Not Contains',
-										value: 'array:notcontains',
-									},
-									{
-										name: 'Array : Not Contains (Ignore Case)',
-										value: 'array:notcontains:ci',
-									},
-									{
-										name: 'Boolean : Equals',
-										value: 'boolean:equal',
-									},
-									{
-										name: 'Boolean : Not Equals',
-										value: 'boolean:notequal',
-									},
-									{
-										name: 'DateTime : Earlier Than',
-										value: 'datetime:earlier',
-									},
-									{
-										name: 'DateTime : Earlier Than or Equal',
-										value: 'datetime:earlierequal',
-									},
-									{
-										name: 'DateTime : Equals',
-										value: 'datetime:equal',
-									},
-									{
-										name: 'DateTime : Later Than',
-										value: 'datetime:later',
-									},
-									{
-										name: 'DateTime : Later Than or Equal',
-										value: 'datetime:laterequal',
-									},
-									{
-										name: 'DateTime : Not Equals',
-										value: 'datetime:notequal',
-									},
-									{
-										name: 'Exists',
-										value: 'basic:exists',
-									},
-									{
-										name: 'Not Exists',
-										value: 'basic:notexists',
-									},
-									{
-										name: 'Numeric : Equals',
-										value: 'numeric:equal',
-									},
-									{
-										name: 'Numeric : Greater Than',
-										value: 'numeric:greater',
-									},
-									{
-										name: 'Numeric : Greater Than or Equal',
-										value: 'numeric:greaterequal',
-									},
-									{
-										name: 'Numeric : Less Than',
-										value: 'numeric:less',
-									},
-									{
-										name: 'Numeric : Less Than or Equal',
-										value: 'numeric:lessequal',
-									},
-									{
-										name: 'Numeric : Not Equals',
-										value: 'numeric:notequal',
-									},
-									{
-										name: 'Text : Contains',
-										value: 'text:contain',
-									},
-									{
-										name: 'Text : Contains (Ignore Case)',
-										value: 'text:contain:ci',
-									},
-									{
-										name: 'Text : Does Not Contain',
-										value: 'text:notcontain',
-									},
-									{
-										name: 'Text : Ends With',
-										value: 'text:endwith',
-									},
-									{
-										name: 'Text : Ends With (Ignore Case)',
-										value: 'text:endwith:ci',
-									},
-									{
-										name: 'Text : Equals',
-										value: 'text:equal',
-									},
-									{
-										name: 'Text : Equals (Ignore Case)',
-										value: 'text:equal:ci',
-									},
-									{
-										name: 'Text : Matches Pattern',
-										value: 'text:matchpattern',
-									},
-									{
-										name: 'Text : Matches Pattern (Ignore Case)',
-										value: 'text:matchpattern:ci',
-									},
-									{
-										name: 'Text : Not Ends With',
-										value: 'text:notendwith',
-									},
-									{
-										name: 'Text : Not Ends With (Ignore Case)',
-										value: 'text:notendwith:ci',
-									},
-									{
-										name: 'Text : Not Equals',
-										value: 'text:notequal',
-									},
-									{
-										name: 'Text : Not Equals (Ignore Case)',
-										value: 'text:notequal:ci',
-									},
-									{
-										name: 'Text : Not Matches Pattern',
-										value: 'text:notmatchpattern',
-									},
-									{
-										name: 'Text : Not Matches Pattern (Ignore Case)',
-										value: 'text:notmatchpattern:ci',
-									},
-									{
-										name: 'Text : Not Starts With',
-										value: 'text:notstartwith',
-									},
-									{
-										name: 'Text : Not Starts With (Ignore Case)',
-										value: 'text:notstartwith:ci',
-									},
-									{
-										name: 'Text : Starts With',
-										value: 'text:startwith',
-									},
-									{
-										name: 'Text : Starts With (Ignore Case)',
-										value: 'text:startwith:ci',
-									},
-									{
-										name: 'Time : Equals',
-										value: 'time:equal',
-									},
-									{
-										name: 'Time : Greater Than',
-										value: 'time:greater',
-									},
-									{
-										name: 'Time : Greater Than or Equal',
-										value: 'time:greaterequal',
-									},
-									{
-										name: 'Time : Less Than',
-										value: 'time:less',
-									},
-									{
-										name: 'Time : Less Than or Equal',
-										value: 'time:lessequal',
-									},
-									{
-										name: 'Time : Not Equals',
-										value: 'time:notequal',
-									},
-								],
-								description: 'Select the comparison operator',
-							},
-							{
-								displayName: 'Value',
-								name: 'value',
-								type: 'string',
-								default: '',
-								displayOptions: {
-									hide: {
-										operator: ['basic:exists', 'basic:notexists'],
-									},
-								},
-								description: 'Enter the value to compare against',
-								placeholder: 'Enter comparison value',
-							},
-							{
-								displayName: 'Operator Type',
-								name: 'operatorType',
-								type: 'options',
-								default: 'AND',
-								options: [
-									{
-										name: 'AND',
-										value: 'AND',
-									},
-									{
-										name: 'OR',
-										value: 'OR',
-									},
-								],
-								description: 'Logical operator to combine with the next condition',
-							},
-						],
-					},
-				],
-			},
 
 			// Hidden field to store product info
 			{
@@ -2059,61 +1443,163 @@ export class WhatsAble implements INodeType {
 			getTemplateVariables,
 		},
 	};
-	// Helper function to build condition payload structure
-	private static buildConditionPayload(conditions: any[]): any[][] {
-		if (!conditions || conditions.length === 0) {
-			return [[], []]; // [AND array, OR array]
-		}
+	private static buildNonTemplateMessagePayload(
+		ctx: IExecuteFunctions,
+		itemIndex: number,
+		recipient: string,
+		messageType: string,
+	): Record<string, unknown> {
+		const base: Record<string, unknown> = {
+			to: recipient,
+			type: messageType,
+			recipient_type: 'individual',
+			messaging_product: 'whatsapp',
+		};
 
-		const andConditions: any[] = [];
-		const orConditions: any[] = [];
-
-		for (let i = 0; i < conditions.length; i++) {
-			const condition = conditions[i];
-			const { field, operator, value } = condition;
-
-			// Skip empty conditions (no field or operator)
-			if (!field || !operator) {
-				continue;
-			}
-
-			// Check if operator needs a value and validate accordingly
-			const operatorNeedsValue = operator !== 'basic:exists' && operator !== 'basic:notexists';
-			
-			// Skip condition if operator needs a value but no value is provided
-			if (operatorNeedsValue && (!value || value.trim() === '')) {
-				continue;
-			}
-
-			// Build condition object with a, o, b structure
-			const conditionObj: any = {
-				a: field,
-				o: operator
+		if (messageType === 'text') {
+			const messageContent = ctx.getNodeParameter('messageContent', itemIndex) as string;
+			const enableLinkPreview = ctx.getNodeParameter('enableLinkPreview', itemIndex, false) as boolean;
+			return {
+				...base,
+				text: {
+					body: messageContent,
+					preview_url: enableLinkPreview,
+				},
 			};
-
-			// Add value (b) only if operator needs it and value exists
-			if (operatorNeedsValue && value) {
-				conditionObj.b = value;
-			}
-
-			// Determine which array to put this condition in based on operatorType
-			if (i === 0) {
-				// First condition always goes to AND array
-				andConditions.push(conditionObj);
-			} else {
-				// Use the logical operator from the PREVIOUS condition
-				const prevCondition = conditions[i - 1];
-				const prevOperatorType = prevCondition.operatorType || 'AND';
-
-				if (prevOperatorType === 'AND') {
-					andConditions.push(conditionObj);
-				} else {
-					orConditions.push(conditionObj);
-				}
-			}
 		}
 
-		return [andConditions, orConditions];
+		if (messageType === 'document') {
+			const documentUrl = ctx.getNodeParameter('documentUrl', itemIndex) as string;
+			const documentCaption = ctx.getNodeParameter('documentCaption', itemIndex, '') as string;
+			const documentFilename = ctx.getNodeParameter('documentFilename', itemIndex) as string;
+			return {
+				...base,
+				document: {
+					link: documentUrl,
+					caption: documentCaption,
+					filename: documentFilename,
+				},
+			};
+		}
+
+		if (messageType === 'image') {
+			const imageUrl = ctx.getNodeParameter('imageUrl', itemIndex) as string;
+			const imageCaption = ctx.getNodeParameter('imageCaption', itemIndex, '') as string;
+			return {
+				...base,
+				image: {
+					link: imageUrl,
+					caption: imageCaption,
+				},
+			};
+		}
+
+		if (messageType === 'video') {
+			const videoUrl = ctx.getNodeParameter('videoUrl', itemIndex) as string;
+			const videoCaption = ctx.getNodeParameter('videoCaption', itemIndex, '') as string;
+			return {
+				...base,
+				video: {
+					link: videoUrl,
+					caption: videoCaption,
+				},
+			};
+		}
+
+		if (messageType === 'audio') {
+			const audioUrl = ctx.getNodeParameter('audioUrl', itemIndex) as string;
+			return {
+				...base,
+				audio: {
+					link: audioUrl,
+				},
+			};
+		}
+
+		throw new NodeOperationError(ctx.getNode(), `Unsupported message type: ${messageType}`);
+	}
+
+	private static buildNonTemplateScheduleFields(
+		ctx: IExecuteFunctions,
+		itemIndex: number,
+	): Record<string, unknown> {
+		const scheduleTypeSpecific = ctx.getNodeParameter('notifyerScheduleTypeSpecific', itemIndex, false) as boolean;
+		const scheduleFields: Record<string, unknown> = {
+			schedule_type: scheduleTypeSpecific ? 'specific' : 'relative',
+		};
+
+		if (scheduleTypeSpecific) {
+			const scheduledDateTime = ctx.getNodeParameter('templateScheduledDateTime', itemIndex) as string;
+			const timezone = ctx.getNodeParameter('templateTimezone', itemIndex) as string;
+			scheduleFields.time_zone = timezone;
+			scheduleFields.schedule_datetime_date = formatScheduleDatetimeUtcIso(scheduledDateTime);
+		} else {
+			const unitOfTimeName = ctx.getNodeParameter('notifyerUnitOfTime', itemIndex) as string;
+			const unitOfTimeRaw = ctx.getNodeParameter('notifyerUnitOfTimeValue', itemIndex) as number | string;
+			scheduleFields.unit_of_time_name = unitOfTimeName;
+			scheduleFields.unit_of_time_value =
+				typeof unitOfTimeRaw === 'number' ? unitOfTimeRaw : Number(unitOfTimeRaw);
+		}
+
+		const replyCondition = ctx.getNodeParameter('notifyerRecipientReplyCondition', itemIndex, '') as string;
+		if (replyCondition && String(replyCondition).trim() !== '') {
+			scheduleFields.condition_one = replyCondition;
+		}
+
+		const labelConditionStatus = ctx.getNodeParameter('notifyerLabelConditionStatus', itemIndex, '') as string;
+		const conditionTwoLabels = ctx.getNodeParameter('notifyerConditionTwoLabels', itemIndex, []) as string[];
+		if (
+			labelConditionStatus &&
+			String(labelConditionStatus).trim() !== '' &&
+			Array.isArray(conditionTwoLabels) &&
+			conditionTwoLabels.length > 0
+		) {
+			scheduleFields.condition_two = {
+				c: labelConditionStatus,
+				v: conditionTwoLabels,
+			};
+		}
+
+		return scheduleFields;
+	}
+
+	private static async sendNonTemplateMessage(
+		ctx: IExecuteFunctions,
+		itemIndex: number,
+		operation: string,
+	): Promise<unknown> {
+		const recipient = ctx.getNodeParameter('nonTemplateRecipient', itemIndex) as string;
+		const messageType = ctx.getNodeParameter('messageType', itemIndex) as string;
+		const note = ctx.getNodeParameter('nonTemplateNote', itemIndex, '') as string;
+		const labels = ctx.getNodeParameter('nonTemplateLabels', itemIndex, []) as string[];
+		const isSchedule = operation === 'scheduleWhatsAppMessage';
+
+		const requestBody: Record<string, unknown> = {
+			...WhatsAble.buildNonTemplateMessagePayload(ctx, itemIndex, recipient, messageType),
+			labels,
+		};
+
+		if (note) {
+			requestBody.note = note;
+		}
+
+		if (isSchedule) {
+			requestBody.is_schedule = true;
+			Object.assign(requestBody, WhatsAble.buildNonTemplateScheduleFields(ctx, itemIndex));
+		}
+
+		const options: IHttpRequestOptions = {
+			method: 'POST',
+			baseURL: BASE_URLS.NOTIFYER,
+			url: '/n8n/messages/general/send',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+			body: requestBody,
+		};
+
+		return ctx.helpers.httpRequestWithAuthentication.call(ctx, 'whatsAbleApi', options);
 	}
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -2154,34 +1640,6 @@ export class WhatsAble implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
-				const productOperationForPayload = this.getNodeParameter('productOperation', i, '') as string;
-
-				// Check if conditions are enabled and build payload (for both immediate and scheduled)
-				const enableConditions = this.getNodeParameter('enableConditions', i, false) as boolean;
-				let searchPayload: Record<string, unknown> = {};
-
-				if (enableConditions && productOperationForPayload === 'sendNonTemplateMessage') {
-					const conditionsData1 = this.getNodeParameter('conditions', i, { values: [] }) as { values: any[] };
-					const conditionsData2 = this.getNodeParameter('conditions2', i, { values: [] }) as { values: any[] };
-					const conditions1 = conditionsData1.values || [];
-					const conditions2 = conditionsData2.values || [];
-					
-					// Build search payload structure (swapped: conversation-based becomes search2, integration-based becomes search1)
-					if (conditions1.length > 0) {
-						const payload1 = WhatsAble.buildConditionPayload(conditions1);
-						// Only add if there are actual valid conditions in either AND or OR arrays
-						if (payload1[0].length > 0 || payload1[1].length > 0) {
-							searchPayload.search2 = payload1; // Conversation-based (conditions) -> search2
-						}
-					}
-					if (conditions2.length > 0) {
-						const payload2 = WhatsAble.buildConditionPayload(conditions2);
-						// Only add if there are actual valid conditions in either AND or OR arrays
-						if (payload2[0].length > 0 || payload2[1].length > 0) {
-							searchPayload.search1 = payload2; // Integration-based (conditions2) -> search1
-						}
-					}
-				}
 
 				let response;
 				if (operation === 'sendWhatsAppMessage') {
@@ -2331,186 +1789,7 @@ export class WhatsAble implements INodeType {
 							options,
 						);
 					} else if (productOperation === 'sendNonTemplateMessage') {
-						// For notifyer product - non-template message sending
-						const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
-						const messageType = this.getNodeParameter('messageType', i) as string;
-						const labels = this.getNodeParameter('nonTemplateLabels', i, []) as string[];
-						
-						// Handle different message types
-						if (messageType === 'text') {
-							const messageContent = this.getNodeParameter('messageContent', i) as string;
-							const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
-							
-							const requestBody: Record<string, any> = {
-								to: recipient,
-								text: {
-									body: messageContent,
-									preview_url: enableLinkPreview
-								},
-								type: "text",
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: requestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						} else if (messageType === 'document') {
-							const documentUrl = this.getNodeParameter('documentUrl', i) as string;
-							const documentCaption = this.getNodeParameter('documentCaption', i, '') as string;
-							const documentFilename = this.getNodeParameter('documentFilename', i) as string;
-							
-							const requestBody: Record<string, any> = {
-								to: recipient,
-								type: "document",
-								document: {
-									link: documentUrl,
-									caption: documentCaption,
-									filename: documentFilename
-								},
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: requestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-							
-						} else if (messageType === 'image') {
-							const imageUrl = this.getNodeParameter('imageUrl', i) as string;
-							const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
-							
-							const requestBody: Record<string, any> = {
-								to: recipient,
-								type: "image",
-								image: {
-									link: imageUrl,
-									caption: imageCaption
-								},
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: requestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-							
-						} else if (messageType === 'video') {
-							const videoUrl = this.getNodeParameter('videoUrl', i) as string;
-							const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
-							
-							const requestBody: Record<string, any> = {
-								to: recipient,
-								type: "video",
-								video: {
-									link: videoUrl,
-									caption: videoCaption
-								},
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: requestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-							
-						} else if (messageType === 'audio') {
-							const audioUrl = this.getNodeParameter('audioUrl', i) as string;
-							
-							const requestBody: Record<string, any> = {
-								to: recipient,
-								type: "audio",
-								audio: {
-									link: audioUrl
-								},
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: requestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						}
+						response = await WhatsAble.sendNonTemplateMessage(this, i, operation);
 					} else if (productOperation === 'updateContact') {
 						// For notifyer product - Update Contact
 						const phoneNumber = this.getNodeParameter('updateContactPhoneNumber', i) as string;
@@ -2729,203 +2008,7 @@ export class WhatsAble implements INodeType {
 							options,
 						);
 					} else if (productOperation === 'sendNonTemplateMessage') {
-						// For notifyer product - scheduled non-template message sending
-						const recipient = this.getNodeParameter('nonTemplateRecipient', i) as string;
-						const messageType = this.getNodeParameter('messageType', i) as string;
-						const labels = this.getNodeParameter('nonTemplateLabels', i, []) as string[];
-						const scheduledTime = this.getNodeParameter('nonTemplateScheduledDateTime', i) as string;
-						const timezone = this.getNodeParameter('nonTemplateTimezone', i) as string;
-						
-						// Format the date with milliseconds and Z suffix
-						const formattedScheduledTime = new Date(scheduledTime).toISOString();
-						
-						// Handle different message types
-						if (messageType === 'text') {
-							const messageContent = this.getNodeParameter('messageContent', i) as string;
-							const enableLinkPreview = this.getNodeParameter('enableLinkPreview', i, false) as boolean;
-							
-							const scheduleRequestBody = {
-								to: recipient,
-								text: {
-									body: messageContent,
-									preview_url: enableLinkPreview
-								},
-								type: "text",
-								time_zone: timezone,
-								is_schedule: true,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								schedule_datetime_date: formattedScheduledTime,
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: scheduleRequestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						} else if (messageType === 'document') {
-							const documentUrl = this.getNodeParameter('documentUrl', i) as string;
-							const documentCaption = this.getNodeParameter('documentCaption', i, '') as string;
-							const documentFilename = this.getNodeParameter('documentFilename', i) as string;
-							
-							const scheduleRequestBody = {
-								to: recipient,
-								document: {
-									link: documentUrl,
-									caption: documentCaption,
-									filename: documentFilename
-								},
-								type: "document",
-								time_zone: timezone,
-								is_schedule: true,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								schedule_datetime_date: formattedScheduledTime,
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: scheduleRequestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						} else if (messageType === 'image') {
-							const imageUrl = this.getNodeParameter('imageUrl', i) as string;
-							const imageCaption = this.getNodeParameter('imageCaption', i, '') as string;
-							
-							const scheduleRequestBody = {
-								to: recipient,
-								image: {
-									link: imageUrl,
-									caption: imageCaption
-								},
-								type: "image",
-								time_zone: timezone,
-								is_schedule: true,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								schedule_datetime_date: formattedScheduledTime,
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: scheduleRequestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						} else if (messageType === 'video') {
-							const videoUrl = this.getNodeParameter('videoUrl', i) as string;
-							const videoCaption = this.getNodeParameter('videoCaption', i, '') as string;
-							
-							const scheduleRequestBody = {
-								to: recipient,
-								type: "video",
-								video: {
-									link: videoUrl,
-									caption: videoCaption
-								},
-								time_zone: timezone,
-								is_schedule: true,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								schedule_datetime_date: formattedScheduledTime,
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: scheduleRequestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						} else if (messageType === 'audio') {
-							const audioUrl = this.getNodeParameter('audioUrl', i) as string;
-							
-							const scheduleRequestBody = {
-								to: recipient,
-								audio: {
-									link: audioUrl
-								},
-								type: "audio",
-								time_zone: timezone,
-								is_schedule: true,
-								recipient_type: "individual",
-								messaging_product: "whatsapp",
-								schedule_datetime_date: formattedScheduledTime,
-								labels: labels,
-								...searchPayload, // Add search1 and search2 if conditions are enabled
-							};
-							
-							const options: IHttpRequestOptions = {
-								method: 'POST',
-								baseURL: BASE_URLS.NOTIFYER,
-								url: '/n8n/general/send-message',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json',
-								},
-								body: scheduleRequestBody,
-								returnFullResponse: true,
-							};
-
-							response = await this.helpers.httpRequestWithAuthentication.call(
-								this,
-								'whatsAbleApi',
-								options,
-							);
-						}
+						response = await WhatsAble.sendNonTemplateMessage(this, i, operation);
 					} else {
 						throw new NodeOperationError(this.getNode(), `Product operation ${productOperation} is not supported for scheduling`);
 					}
