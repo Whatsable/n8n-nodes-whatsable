@@ -7,7 +7,7 @@ export class WhatsAbleApi implements ICredentialType {
 	// Uses the link to this tutorial as an example
 	// Replace with your own docs links when building your own nodes
 	documentationUrl =
-		'https://docs.whatsable.app/n8n-overview';
+		'https://docs.whatsable.app/integration/n8n';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',

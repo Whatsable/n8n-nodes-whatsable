@@ -17,7 +17,7 @@ describe('WhatsAbleTriggerApi Credentials', () => {
 	});
 
 	test('should have the correct documentation URL', () => {
-		expect(credentials.documentationUrl).toBe('https://docs.whatsable.app/n8n-overview');
+		expect(credentials.documentationUrl).toBe('https://docs.whatsable.app/integration/n8n');
 	});
 
 	test('should have required properties', () => {

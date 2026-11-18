@@ -9,7 +9,7 @@ import { BASE_DOMAIN } from '../shared/constants';
 export class WhatsAbleNotifyerSystemAllApi implements ICredentialType {
     name = 'whatsAbleNotifyerSystemAllApi';
     displayName = 'Notifyer System API';
-    documentationUrl = 'https://docs.whatsable.app/n8n-overview';
+    documentationUrl = 'https://docs.whatsable.app/integration/n8n';
     
     // Properties shown in the credentials dialog
     properties: INodeProperties[] = [
