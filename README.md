@@ -4,348 +4,110 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Installation](#installation)
-- [Authentication](#authentication)
-- [Features](#features)
-- [How to Use WhatsAble Action Node](#how-to-use-whatsable-action-node)
-- [How to Use WhatsAble Trigger Node](#how-to-use-whatsable-trigger-node)
-- [How to Use Notifier Action Node](#how-to-use-notifier-action-node)
-- [How to Use Notifier Trigger Node](#how-to-use-notifier-trigger-node)
-- [How to Use Notifyer System Action Node](#how-to-use-notifyer-system-action-node)
-- [How to Use Notifyer System Trigger Node](#how-to-use-notifyer-system-trigger-node)
-- [Common Use Cases](#common-use-cases)
-- [Best Practices](#best-practices)
-- [Support](#support)
-- [License](#license)
-- [Resources](#resources)
-
----
-
 # n8n-nodes-whatsable
 
-This is an [n8n](https://n8n.io/) community node for integrating with the WhatsAble Suite, providing powerful WhatsApp messaging automation capabilities.
+This is an [n8n](https://n8n.io/) community node. It lets you use WhatsAble in your n8n workflows: start a workflow from a WhatsApp message, send template and non-template messages, schedule a message for later, and update a contact.
 
----
+WhatsAble is a WhatsApp Business platform with a shared inbox, AI chatbots, and automations. [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## Overview
-
-The WhatsAble Suite offers a comprehensive set of messaging tools that integrate seamlessly with n8n, enabling powerful automation workflows for businesses of all sizes. The suite comprises three powerful messaging platforms:
-
-### WhatsAble
-- Ideal for small businesses and startups
-- Simple integration with n8n
-- Basic media support
-- Subscription-based pricing
-- 7-day free trial
-- [Documentation](https://docs.whatsable.app/guides/whatsable/n8n)
-
-### Notifier by WhatsAble
-- Perfect for medium-sized businesses
-- Enhanced template support
-- Standard media capabilities
-- Flexible pricing options
-- Available free trial
-- [Documentation](https://docs.whatsable.app/guides/notifier/n8n)
-
-### Notifyer System
-- Enterprise-grade solution
-- Advanced template capabilities
-- Full media support
-- Enterprise pricing
-- Try for free with 2 numbers
-- [Documentation](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Usage](#usage)  
+[Compatibility](#compatibility)  
+[Common use cases](#common-use-cases)  
+[Support](#support)  
+[Resources](#resources)  
+[Running locally](#running-locally)  
+[Contributing](#contributing)
 
 ---
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation. On a self-hosted n8n you can also install the package from npm:
+
+```bash
+npm install n8n-nodes-whatsable
+```
 
 ---
 
-## Authentication
+## Operations
 
-To use this node, you need to have an API key from your chosen WhatsAble Suite platform:
+The package has two nodes: **WhatsAble for WhatsApp** (actions) and a **WhatsAble Trigger**.
 
-1. Sign up at [WhatsAble](https://whatsable.app)
-2. Choose your platform (WhatsAble, Notifier, or Notifyer System)
-3. Complete the verification process
-4. Generate an API key from your platform's dashboard
+### Trigger
 
-> **Note:** Keep your API key secure and never share it publicly.
+| Node | What it does |
+| --- | --- |
+| **On new Incoming message event** (node name: Incoming/outgoing WhatsApp message Trigger) | Starts a workflow when a contact writes to your WhatsApp number. Incoming audio messages are transcribed to text and included in the payload. |
 
----
+### Actions
 
-## Features
+Set **Resource** to **Send Message**, then choose an **Operation**.
 
-### WhatsAble Node
-- Send messages
-- Send template messages (Via Notifyer System)
-- Send non-template messages
-- Schedule messages
-- Support for various media types
-- [Documentation](https://docs.whatsable.app/guides/whatsable/n8n)
-
-### WhatsAble Trigger Node
-- Receive incoming messages
-- Handle webhooks
-- Process notifications
-- Real-time message triggers
-- [Documentation](https://docs.whatsable.app/guides/whatsable/n8n)
+| Operation | What it does |
+| --- | --- |
+| **Send WhatsApp Message** | Sends a message right away. **Product Operation**: **Send Message Template** (an approved template with variables) or **Send Non Template Message** (text, image, video, document, or audio, inside the 24-hour customer service window). |
+| **Schedule WhatsApp Message** | Sends a template or non-template message later, after a delay (minutes, hours, days) or at a specific date and time in a timezone you choose. Optional conditions: send only if the contact did not reply, or only if the contact has (or does not have) a label. |
+| **Manage Contact** | **Update Contact**: add a note and add or remove labels on a contact. Nothing is sent to the contact. |
+| **Send WhatsApp Message to a Group** | Sends a message to a WhatsApp group. Available for WhatsAble Bot keys. It does not use the official WhatsApp API and is a separate offering (beta). |
 
 ---
 
-## How to Use WhatsAble Action Node
+## Credentials
 
-### Prerequisites
-- An active WhatsAble subscription
-- Access to n8n workflow automation platform
-- A verified WhatsApp number in your WhatsAble dashboard
+You need a WhatsAble API key.
 
-### Setup Process
+1. Sign in to your WhatsAble account and open **API keys**.
+2. Create a key. Choose the WhatsApp number that the key sends from.
+3. In n8n, add the **WhatsAble API** credential to the node and paste the key.
 
-1. **Subscribe to WhatsAble**
-   - Log in to your WhatsAble dashboard
-   - Click the Subscribe button
-   - Start your 7-day free trial
-   - Note: After trial, pricing is $8.99 per month per phone number
-2. **Add and Verify Phone Number**
-   - Navigate to Verified Numbers in your dashboard
-   - Click Add New Number
-   - Enter your phone number (with country code)
-   - Complete the WhatsApp verification process
-   - Note: Only first number needs verification
-3. **Get Your API Key**
-   - Go to API Keys in your WhatsAble dashboard
-   - Copy your unique API key
-   - Store it securely for the integration
+An API key belongs to one WhatsApp number. Messages sent with the key go out from that number, and a trigger registered with the key receives that number's messages. To work with two numbers, create one key and one credential for each.
 
-### Integration Steps
+For the trigger, copy the **Production URL** from the trigger node and paste it, with your API key, into the trigger credential. Saving the credential checks the key and registers the URL.
 
-1. Create a new workflow in n8n
-2. Add your preferred trigger node and configure its settings
-3. Add the WhatsAble node
-4. In the WhatsAble node settings:
-   - Select "Create new credential"
-   - Enter your WhatsAble API key
-   - Name your credential (e.g., "WhatsAble Production")
-   - Click Save
-5. Configure message settings:
-   - Select "Send Message (WhatsAble)" operation
-   - Fill in required and optional fields
-6. Click "Test Step" to verify
-7. Save your workflow and activate it
+> **Note:** Keep your API key secret. Never share it publicly or commit it to version control.
 
-For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs.whatsable.app/guides/whatsable/n8n)
+The package also contains credential types for the older WhatsAble Bot and Notifier products. New setups use the steps above.
 
 ---
 
-## How to Use WhatsAble Trigger Node
+## Usage
 
-### Prerequisites
-- An active WhatsAble subscription
-- Access to n8n workflow automation platform
-- A verified WhatsApp number in your WhatsAble dashboard
+Step-by-step guides, with screenshots and example workflows:
 
-### Setup Process
+- [n8n overview](https://docs.whatsable.app/integration/n8n)
+- [Start a workflow from a WhatsApp message](https://docs.whatsable.app/integration/n8n/trigger)
+- [Send a WhatsApp message](https://docs.whatsable.app/integration/n8n/send-message)
+- [Schedule a WhatsApp message](https://docs.whatsable.app/integration/n8n/schedule-message)
+- [Update a contact](https://docs.whatsable.app/integration/n8n/update-contact)
+- [Every field of the node](https://docs.whatsable.app/integration/n8n/fields)
 
-1. **Get Your Webhook URL**
-   - Open the WhatsAble Trigger Node in n8n
-   - At the top of the node, locate "Webhook URLs"
-   - Click the "Production URL" to copy it to your clipboard
-   - This URL will be used to receive incoming messages
-2. **Configure Credentials**
-   - In the WhatsAble Trigger Node settings:
-     - Paste the Production Webhook URL in the "Production URL" input box
-     - Enter your WhatsAble API key in the "API Key" input box
-     - Click Save
-     - A green success message will appear if the configuration is successful
-3. **Activate the Trigger**
-   - Click "Test Step" to verify the connection
-   - Save your workflow
-   - Toggle "Active" to start receiving messages
-   - Connect the trigger to any action node to process incoming messages
-
-For detailed documentation, visit [WhatsAble n8n Integration Guide](https://docs.whatsable.app/guides/whatsable/n8n)
+> **Note:** Running a test step on a send or schedule operation sends a real WhatsApp message. Test with your own phone number first.
 
 ---
 
-## How to Use Notifier Action Node
+## Compatibility
 
-### Prerequisites
-- An active Notifier account (Monthly or Pay-as-you-go plan)
-- Access to n8n workflow automation platform
-- Business information ready for configuration
-
-### Setup Process
-
-1. **Configure Business Information**
-   - Log in to your Notifier dashboard
-   - Navigate to Business Information
-   - Complete required fields
-   - Verify your WhatsApp number with the code sent
-2. **Get Your API Key**
-   - Go to API Keys in your Notifier dashboard
-   - Copy your unique API key
-   - Store it securely for the integration
-
-### Integration Steps
-
-1. Create a new workflow in n8n
-2. Add your preferred trigger node and configure its settings
-3. Add the WhatsAble node
-4. In the WhatsAble node settings:
-   - Select "Create new credential"
-   - Enter your Notifier API key
-   - Name your credential (e.g., "Notifier Production")
-   - Click Save
-5. Configure message settings:
-   - Select "Send Message (Notifier)" operation
-   - Fill in required and optional fields
-6. Click "Test Step" to verify
-7. Save your workflow and activate it
-
-### Example Workflows with Notifier
-- Lead Nurturing: Trigger on form submission, send personalized welcome, schedule follow-ups
-- Order Confirmations: Trigger on order status change, send update with details
-- Event Reminders: Trigger on calendar event, send reminder with RSVP link
-- Customer Feedback: Trigger on purchase, send feedback request
-- Support Ticket Updates: Trigger on ticket status change, send update
-
-For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.whatsable.app/guides/notifier/n8n)
+The package targets n8n Nodes API version 1 and Node.js 18.10 or later.
 
 ---
 
-## How to Use Notifier Trigger Node
+## Common use cases
 
-### Prerequisites
-- An active Notifier account
-- Access to n8n workflow automation platform
-- Business information configured in Notifier
-
-### Setup Process
-
-1. **Get Your Webhook URL**
-   - Open the Notifier Trigger Node in n8n
-   - At the top of the node, locate "Webhook URLs"
-   - Click the "Production URL" to copy it to your clipboard
-   - This URL will be used to receive incoming messages
-2. **Configure Credentials**
-   - In the Notifier Trigger Node settings:
-     - Paste the Production Webhook URL in the "Production URL" input box
-     - Enter your Notifier API key in the "API Key" input box
-     - Click Save
-     - A green success message will appear if the configuration is successful
-3. **Activate the Trigger**
-   - Click "Test Step" to verify the connection
-   - Save your workflow
-   - Toggle "Active" to start receiving messages
-   - Connect the trigger to any action node to process incoming messages
-
-For detailed documentation, visit [Notifier n8n Integration Guide](https://docs.whatsable.app/guides/notifier/n8n)
-
----
-
-## How to Use Notifyer System Action Node
-
-### Prerequisites
-- An active Notifyer System account
-- Access to n8n workflow automation platform
-- Completed WhatsApp Business Platform embedding process
-
-### Setup Process
-
-1. **Complete Platform Embedding**
-   - Connect your WhatsApp Business account
-   - Complete Meta's business verification
-   - Ensure compliance with WhatsApp Business Platform policies
-2. **Set Up Message Templates**
-   - Navigate to Templates in your dashboard
-   - Create new templates and submit for review
-3. **Get Your API Key**
-   - Go to API Keys in your Notifyer dashboard
-   - Copy your unique API key
-   - Store it securely for the integration
-
-### Integration Steps
-
-1. Create a new workflow in n8n
-2. Add your preferred trigger node and configure its settings
-3. Add the WhatsAble node
-4. In the WhatsAble node settings:
-   - Select "Create new credential"
-   - Enter your Notifyer System API key
-   - Name your credential (e.g., "Notifyer System Production")
-   - Click Save
-5. Configure message settings:
-   - Choose between template and non-template message operations
-   - Fill in required and optional fields
-6. Click "Test Step" to verify
-7. Save your workflow and activate it
-
-### Example Workflows with Notifyer System
-- Order Confirmations: Trigger on new order, send template message with details
-- Appointment Reminders: Trigger on calendar event, send template message
-- Lead Notifications: Trigger on new CRM lead, send non-template message
-- Customer Support: Trigger on new support ticket, send template message
-- Delivery Updates: Trigger on shipping status change, send template message
-
-For detailed documentation, visit [Notifyer System n8n Integration Guide](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
-
----
-
-## How to Use Notifyer System Trigger Node
-
-### Prerequisites
-- An active Notifyer System account
-- Access to n8n workflow automation platform
-- Completed WhatsApp Business Platform embedding process
-
-### Setup Process
-
-1. **Get Your Webhook URL**
-   - Open the Notifyer System Trigger Node in n8n
-   - At the top of the node, locate "Webhook URLs"
-   - Click the "Production URL" to copy it to your clipboard
-   - This URL will be used to receive incoming messages
-2. **Configure Credentials**
-   - In the Notifyer System Trigger Node settings:
-     - Paste the Production Webhook URL in the "Production URL" input box
-     - Enter your Notifyer System API key in the "API Key" input box
-     - Click Save
-     - A green success message will appear if the configuration is successful
-3. **Activate the Trigger**
-   - Click "Test Step" to verify the connection
-   - Save your workflow
-   - Toggle "Active" to start receiving messages
-   - Connect the trigger to any action node to process incoming messages
-
-For detailed documentation, visit [Notifyer System n8n Integration Guide](https://docs.whatsable.app/guides/notifier-system/n8n-overview)
-
----
-
-## Common Use Cases
-
-- Lead Qualification: Automated follow-up, lead scoring, response tracking
-- Order Notifications: Confirmations, shipping updates, delivery notifications
-- Appointment Reminders: Automated reminders, confirmations, calendar integration
-- Customer Support: Ticket routing, automated responses, support updates
-- Payment Reminders: Invoice notifications, payment confirmations, subscription reminders
+- Lead qualification: follow up with leads, and skip the follow-up when they already replied.
+- Order notifications: confirmations, shipping updates, and delivery messages.
+- Appointment reminders: schedule a reminder before each appointment.
+- Customer support: route a new message to the right person.
+- Payment reminders: invoice and subscription reminders.
 
 ---
 
 ## Support
 
-For technical support and assistance:
-
-- **Email Support**: Contact our dedicated support team
-- **Video Tutorials**: Watch step-by-step integration guides
-- **Implementation Help**: Get expert assistance with workflows
-
-For enterprise-level support or custom solutions, contact our solution engineers at team@whatsable.app
+For technical support and assistance, contact team@whatsable.app.
 
 ---
 
@@ -357,9 +119,9 @@ For enterprise-level support or custom solutions, contact our solution engineers
 
 ## Resources
 
-- [WhatsAble Website](https://whatsable.app)
-- [n8n Documentation](https://docs.n8n.io)
-- [WhatsAble Suite n8n Overview](https://docs.whatsable.app/n8n-overview)
+- [WhatsAble website](https://whatsable.app)
+- [WhatsAble documentation](https://docs.whatsable.app)
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 
 ---
 
