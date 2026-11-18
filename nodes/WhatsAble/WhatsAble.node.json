@@ -8,12 +8,12 @@
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://docs.whatsable.app/n8n-overview"
+				"url": "https://docs.whatsable.app/integration/n8n"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://docs.whatsable.app/n8n-overview"
+				"url": "https://docs.whatsable.app/integration/n8n/send-message"
 			}
 		]
 	}
